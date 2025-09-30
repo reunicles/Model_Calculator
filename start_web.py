@@ -10,5 +10,5 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scripts'))
 
 if __name__ == "__main__":
-    from start_web import main
-    main()
+    import start_web as web_script
+    web_script.main()

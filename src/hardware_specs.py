@@ -107,6 +107,15 @@ def get_hardware_comparison(model_memory_gb: float, model_flops: float,
         # Overall fit
         overall_fits = memory_fits and flops_fits
         
+        # Calculate replicas needed to saturate hardware
+        # Replicas = ceil(100% / bottleneck_utilization), capped at 100
+        bottleneck_utilization = min(memory_ratio, flops_ratio)
+        if bottleneck_utilization > 0:
+            import math
+            replicas_needed = min(math.ceil(1.0 / bottleneck_utilization), 100)
+        else:
+            replicas_needed = "N/A"  # Division by zero case
+        
         results[spec_name] = {
             "name": spec.name,
             "description": spec.description,
@@ -118,7 +127,8 @@ def get_hardware_comparison(model_memory_gb: float, model_flops: float,
             "flops_fits": flops_fits,
             "overall_fits": overall_fits,
             "memory_utilization": f"{memory_ratio:.1%}",
-            "flops_utilization": f"{flops_ratio:.1%}"
+            "flops_utilization": f"{flops_ratio:.1%}",
+            "replicas_needed": replicas_needed
         }
     
     return results

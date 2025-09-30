@@ -1005,6 +1005,7 @@
                             <div class="hardware-details">
                                 <div>Memory: ${gpu.memory_utilization} of ${gpu.memory_gb.toFixed(0)} GB</div>
                                 <div>FLOPS: ${gpu.flops_utilization} of ${(gpu.flops/1e15).toFixed(1)} PFLOPS</div>
+                                <div><strong>Replicas:</strong> ${gpu.replicas_needed} needed to saturate hardware</div>
                             </div>
                         </div>
                     `;
@@ -1020,6 +1021,7 @@
                             <div class="hardware-details">
                                 <div>Memory: ${gpu.memory_utilization} of ${gpu.memory_gb.toFixed(0)} GB</div>
                                 <div>FLOPS: ${gpu.flops_utilization} of ${(gpu.flops/1e15).toFixed(1)} PFLOPS</div>
+                                <div><strong>Replicas:</strong> ${gpu.replicas_needed} needed to saturate hardware</div>
                             </div>
                         </div>
                     `;
