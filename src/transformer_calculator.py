@@ -2440,7 +2440,27 @@ class TransformerCalculator:
             memory_components = self.calculate_memory(mode)
             flops_components = self.calculate_flops(mode)
             reuse_components = self.calculate_reuse(mode)
-            return self._format_all_tables(memory_components, flops_components, reuse_components, mode)
+            
+            # Add hardware comparison for comprehensive analysis
+            formatter = TableFormatter(self.config)
+            # Map data types for hardware comparison
+            dtype_mapping = {
+                'fp32': 'fp32',
+                'fp16': 'fp16', 
+                'bf16': 'fp16',  # BF16 uses similar FLOPS as FP16
+                'int8': 'fp16',  # Use FP16 as approximation
+                'int4': 'fp16',  # Use FP16 as approximation
+                'fp8': 'fp16'    # Use FP16 as approximation
+            }
+            mapped_dtype = dtype_mapping.get(self.config.dtype.value, 'fp16')
+            hardware_comparison = formatter.format_hardware_comparison(
+                memory_components.total / (1024**3),  # Convert to GB
+                flops_components.total,
+                mapped_dtype
+            )
+            
+            all_tables = self._format_all_tables(memory_components, flops_components, reuse_components, mode)
+            return all_tables + "\n\n" + hardware_comparison
         else:
             # Use TableFormatter for individual tables
             formatter = TableFormatter(self.config)

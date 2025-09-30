@@ -5,7 +5,12 @@ This module provides formatting utilities for tables and human-readable numbers
 used in the transformer calculator output.
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
+try:
+    from .hardware_specs import get_hardware_comparison, format_hardware_summary, get_hardware_json
+except ImportError:
+    # Fallback for when run as script
+    from hardware_specs import get_hardware_comparison, format_hardware_summary, get_hardware_json
 
 
 class TableFormatter:
@@ -245,3 +250,35 @@ Attention Heads: {self.config.num_attention_heads} (KV: {self.config.num_key_val
 """
         
         return table
+    
+    def format_hardware_comparison(self, memory_gb: float, flops: float, 
+                                 data_type: str = "fp16") -> str:
+        """
+        Format hardware capability comparison
+        
+        Args:
+            memory_gb: Model memory requirement in GB
+            flops: Model FLOPS requirement
+            data_type: Data type for FLOPS comparison
+        
+        Returns:
+            Formatted hardware comparison string
+        """
+        comparison_results = get_hardware_comparison(memory_gb, flops, data_type)
+        return format_hardware_summary(comparison_results)
+    
+    def get_hardware_comparison_data(self, memory_gb: float, flops: float,
+                                   data_type: str = "fp16") -> Dict[str, Any]:
+        """
+        Get hardware comparison data for web interface
+        
+        Args:
+            memory_gb: Model memory requirement in GB
+            flops: Model FLOPS requirement
+            data_type: Data type for FLOPS comparison
+        
+        Returns:
+            Hardware comparison data as dictionary
+        """
+        comparison_results = get_hardware_comparison(memory_gb, flops, data_type)
+        return get_hardware_json(comparison_results)

@@ -205,6 +205,47 @@
             font-size: 1.3em;
         }
         
+        .hardware-comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .hardware-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .hardware-item h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 1.1em;
+        }
+        
+        .hardware-status {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .hardware-status.fits {
+            color: #28a745;
+        }
+        
+        .hardware-status.exceeds {
+            color: #dc3545;
+        }
+        
+        .hardware-details {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        .hardware-details div {
+            margin-bottom: 5px;
+        }
+        
         .result-value {
             font-size: 2em;
             font-weight: bold;
@@ -944,6 +985,98 @@
                     </div>
                 </div>
             `;
+            
+            // Add hardware comparison if available
+            if (results.hardware_comparison) {
+                html += `
+                <div class="result-card">
+                    <h3>Hardware Capability Comparison</h3>
+                    <div class="hardware-comparison">
+                `;
+                
+                // Single GPU comparison
+                if (results.hardware_comparison.gb300_single_gpu) {
+                    const gpu = results.hardware_comparison.gb300_single_gpu;
+                    const status = gpu.overall_fits ? '✅ FITS' : '❌ EXCEEDS';
+                    html += `
+                        <div class="hardware-item">
+                            <h4>${gpu.name}</h4>
+                            <div class="hardware-status ${gpu.overall_fits ? 'fits' : 'exceeds'}">${status}</div>
+                            <div class="hardware-details">
+                                <div>Memory: ${gpu.memory_utilization} of ${gpu.memory_gb.toFixed(0)} GB</div>
+                                <div>FLOPS: ${gpu.flops_utilization} of ${(gpu.flops/1e15).toFixed(1)} PFLOPS</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (results.hardware_comparison.vr200_single_gpu) {
+                    const gpu = results.hardware_comparison.vr200_single_gpu;
+                    const status = gpu.overall_fits ? '✅ FITS' : '❌ EXCEEDS';
+                    html += `
+                        <div class="hardware-item">
+                            <h4>${gpu.name}</h4>
+                            <div class="hardware-status ${gpu.overall_fits ? 'fits' : 'exceeds'}">${status}</div>
+                            <div class="hardware-details">
+                                <div>Memory: ${gpu.memory_utilization} of ${gpu.memory_gb.toFixed(0)} GB</div>
+                                <div>FLOPS: ${gpu.flops_utilization} of ${(gpu.flops/1e15).toFixed(1)} PFLOPS</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Node comparison
+                if (results.hardware_comparison.gb300_node_estimate) {
+                    const node = results.hardware_comparison.gb300_node_estimate;
+                    const status = node.overall_fits ? '✅ FITS' : '❌ EXCEEDS';
+                    html += `
+                        <div class="hardware-item">
+                            <h4>${node.name}</h4>
+                            <div class="hardware-status ${node.overall_fits ? 'fits' : 'exceeds'}">${status}</div>
+                            <div class="hardware-details">
+                                <div>Memory: ${node.memory_utilization} of ${node.memory_gb.toFixed(0)} GB</div>
+                                <div>FLOPS: ${node.flops_utilization} of ${(node.flops/1e15).toFixed(1)} PFLOPS</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Rack comparison
+                if (results.hardware_comparison.gb300_nvl72_rack) {
+                    const rack = results.hardware_comparison.gb300_nvl72_rack;
+                    const status = rack.overall_fits ? '✅ FITS' : '❌ EXCEEDS';
+                    html += `
+                        <div class="hardware-item">
+                            <h4>${rack.name}</h4>
+                            <div class="hardware-status ${rack.overall_fits ? 'fits' : 'exceeds'}">${status}</div>
+                            <div class="hardware-details">
+                                <div>Memory: ${rack.memory_utilization} of ${rack.memory_gb.toFixed(0)} GB</div>
+                                <div>FLOPS: ${rack.flops_utilization} of ${(rack.flops/1e15).toFixed(1)} PFLOPS</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (results.hardware_comparison.vr200_nvl144_rack) {
+                    const rack = results.hardware_comparison.vr200_nvl144_rack;
+                    const status = rack.overall_fits ? '✅ FITS' : '❌ EXCEEDS';
+                    html += `
+                        <div class="hardware-item">
+                            <h4>${rack.name}</h4>
+                            <div class="hardware-status ${rack.overall_fits ? 'fits' : 'exceeds'}">${status}</div>
+                            <div class="hardware-details">
+                                <div>Memory: ${rack.memory_utilization} of ${rack.memory_gb.toFixed(0)} GB</div>
+                                <div>FLOPS: ${rack.flops_utilization} of ${(rack.flops/1e15).toFixed(1)} PFLOPS</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    </div>
+                </div>
+                `;
+            }
             
             resultsDiv.innerHTML = html;
         }

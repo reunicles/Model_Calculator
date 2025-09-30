@@ -290,6 +290,16 @@ def calculate():
                 'moe_intermediate_size': config.moe_intermediate_size
             })
         
+        # Add hardware comparison
+        from .table_formatter import TableFormatter
+        formatter = TableFormatter(config)
+        hardware_comparison = formatter.get_hardware_comparison_data(
+            memory.total / (1024**3),  # Convert to GB
+            flops.total,
+            config.dtype.value
+        )
+        results['hardware_comparison'] = hardware_comparison
+        
         return jsonify({'success': True, 'results': results})
         
     except Exception as e:
@@ -414,6 +424,16 @@ def calculate_hf_model():
                 'hf_path': hf_path
             }
         }
+        
+        # Add hardware comparison
+        from .table_formatter import TableFormatter
+        formatter = TableFormatter(config)
+        hardware_comparison = formatter.get_hardware_comparison_data(
+            memory.total / (1024**3),  # Convert to GB
+            flops.total,
+            config.dtype.value
+        )
+        results['hardware_comparison'] = hardware_comparison
         
         return jsonify({'success': True, 'results': results})
         
