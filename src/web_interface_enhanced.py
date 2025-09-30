@@ -291,7 +291,11 @@ def calculate():
             })
         
         # Add hardware comparison
-        from .table_formatter import TableFormatter
+        try:
+            from .table_formatter import TableFormatter
+        except ImportError:
+            # Fallback for when run as script
+            from table_formatter import TableFormatter
         formatter = TableFormatter(config)
         hardware_comparison = formatter.get_hardware_comparison_data(
             memory.total / (1024**3),  # Convert to GB
@@ -426,7 +430,11 @@ def calculate_hf_model():
         }
         
         # Add hardware comparison
-        from .table_formatter import TableFormatter
+        try:
+            from .table_formatter import TableFormatter
+        except ImportError:
+            # Fallback for when run as script
+            from table_formatter import TableFormatter
         formatter = TableFormatter(config)
         hardware_comparison = formatter.get_hardware_comparison_data(
             memory.total / (1024**3),  # Convert to GB
