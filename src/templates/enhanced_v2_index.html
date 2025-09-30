@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Transformer Calculator v2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .form-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        
+        .results-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .results-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #e9ecef;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .result-card h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .hf-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #2196f3;
+        }
+        
+        .hf-section h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .hf-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .hf-input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .hf-input-group input:focus {
+            outline: none;
+            border-color: #2196f3;
+        }
+        
+        .model-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .model-info h4 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .model-info pre {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        .model-parameters {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .model-parameters h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .parameter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .parameter-item {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .parameter-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+        
+        .parameter-value {
+            color: #667eea;
+            font-weight: 500;
+        }
+        
+        .popular-models {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .popular-models h4 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .model-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        
+        .model-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .model-item:hover {
+            background: #e3f2fd;
+        }
+        
+        .model-item-name {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .model-item-desc {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .hf-input-group {
+                flex-direction: column;
+            }
+            
+            .parameter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Enhanced Transformer Calculator v2</h1>
+            <p>Calculate HBM Memory and GPU FLOPS for Transformer Models with HuggingFace Integration</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-section">
+                <h2>Model Configuration</h2>
+                
+                <!-- HuggingFace Integration Section -->
+                <div class="hf-section">
+                    <h3>🤗 HuggingFace Model Selection</h3>
+                    
+                    <!-- Popular Models -->
+                    <div class="popular-models">
+                        <h4>Popular Models</h4>
+                        <div class="model-list" id="popular_models">
+                            <div class="loading">Loading popular models...</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Custom Model Input -->
+                    <div class="hf-input-group">
+                        <input type="text" id="hf_path" placeholder="Enter HuggingFace model path (e.g., Qwen/Qwen2.5-7B)" />
+                        <button class="btn btn-success" onclick="fetchHFModel()">Load Model</button>
+                    </div>
+                    
+                    <!-- Model Information Display -->
+                    <div class="model-info" id="model_info" style="display: none;">
+                        <h4>Model Information:</h4>
+                        <pre id="model_details"></pre>
+                    </div>
+                </div>
+                
+                <!-- Model Parameters Display -->
+                <div class="model-parameters" id="model_parameters" style="display: none;">
+                    <h4>Model Parameters</h4>
+                    <div class="parameter-grid" id="parameter_grid">
+                        <!-- Parameters will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Manual Configuration -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('manual')">Manual Config</button>
+                    <button class="tab" onclick="switchTab('advanced')">Advanced</button>
+                </div>
+                
+                <div id="manual-tab" class="tab-content active">
+                    <div class="form-group">
+                        <label for="model_type">Model Type</label>
+                        <select id="model_type" onchange="toggleMoEParams()">
+                            <option value="dense">Dense</option>
+                            <option value="moe">MoE (Mixture of Experts)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="num_layers">Number of Layers</label>
+                            <input type="number" id="num_layers" value="32" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="hidden_size">Hidden Size</label>
+                            <input type="number" id="hidden_size" value="4096" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="num_attention_heads">Attention Heads</label>
+                            <input type="number" id="num_attention_heads" value="32" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="intermediate_size">Intermediate Size</label>
+                            <input type="number" id="intermediate_size" value="11008" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vocab_size">Vocabulary Size</label>
+                            <input type="number" id="vocab_size" value="32000" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="dtype">Data Type</label>
+                            <select id="dtype">
+                                <option value="fp32">FP32</option>
+                                <option value="fp16">FP16</option>
+                                <option value="bf16" selected>BF16</option>
+                                <option value="int8">INT8</option>
+                                <option value="int4">INT4</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="advanced-tab" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sequence_length">Sequence Length</label>
+                            <input type="number" id="sequence_length" value="2048" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="batch_size">Batch Size</label>
+                            <input type="number" id="batch_size" value="1" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mode">Operation Mode</label>
+                            <select id="mode">
+                                <option value="pretraining">Pretraining</option>
+                                <option value="prefill" selected>Prefill</option>
+                                <option value="decode">Decode</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="decode_len">Decode Length</label>
+                            <input type="number" id="decode_len" value="64" min="1">
+                        </div>
+                    </div>
+                    
+                    <!-- MoE Parameters (hidden by default) -->
+                    <div id="moe_params" style="display: none;">
+                        <h3>MoE Parameters</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="num_experts">Number of Experts</label>
+                                <input type="number" id="num_experts" value="8" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="top_k">Top-K</label>
+                                <input type="number" id="top_k" value="2" min="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="expert_capacity_factor">Expert Capacity Factor</label>
+                            <input type="number" id="expert_capacity_factor" value="1.0" min="0.1" step="0.1">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="calculate()">Calculate</button>
+                <button class="btn btn-secondary" onclick="runBenchmark()">Run Benchmark</button>
+            </div>
+            
+            <div class="results-section">
+                <h2>Results</h2>
+                <div id="results">
+                    <div class="loading">Enter model parameters and click Calculate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load popular models on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPopularModels();
+        });
+        
+        // Load popular models
+        async function loadPopularModels() {
+            try {
+                const response = await fetch('/api/hf-models');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayPopularModels(result.models);
+                }
+            } catch (error) {
+                console.error('Error loading popular models:', error);
+            }
+        }
+        
+        // Display popular models
+        function displayPopularModels(models) {
+            const container = document.getElementById('popular_models');
+            let html = '';
+            
+            models.forEach(model => {
+                html += `
+                    <div class="model-item" onclick="selectModel('${model.path}')">
+                        <div class="model-item-name">${model.name}</div>
+                        <div class="model-item-desc">${model.description}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Select model from popular models
+        function selectModel(modelPath) {
+            document.getElementById('hf_path').value = modelPath;
+            fetchHFModel();
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Toggle MoE parameters
+        function toggleMoEParams() {
+            const modelType = document.getElementById('model_type').value;
+            const moeParams = document.getElementById('moe_params');
+            
+            if (modelType === 'moe') {
+                moeParams.style.display = 'block';
+            } else {
+                moeParams.style.display = 'none';
+            }
+        }
+        
+        // Fetch HuggingFace model
+        async function fetchHFModel() {
+            const hfPath = document.getElementById('hf_path').value;
+            const modelInfo = document.getElementById('model_info');
+            const modelDetails = document.getElementById('model_details');
+            const modelParameters = document.getElementById('model_parameters');
+            const parameterGrid = document.getElementById('parameter_grid');
+            
+            if (!hfPath) {
+                alert('Please enter a HuggingFace model path');
+                return;
+            }
+            
+            modelInfo.style.display = 'block';
+            modelDetails.textContent = 'Loading model configuration...';
+            
+            try {
+                const response = await fetch('/api/fetch-model', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        hf_path: hfPath,
+                        sequence_length: parseInt(document.getElementById('sequence_length').value),
+                        batch_size: parseInt(document.getElementById('batch_size').value),
+                        decode_len: parseInt(document.getElementById('decode_len').value)
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Populate form fields with fetched configuration
+                    populateForm(result.model_info);
+                    
+                    // Display model information
+                    modelDetails.textContent = JSON.stringify(result.model_info, null, 2);
+                    
+                    // Display model parameters
+                    displayModelParameters(result.model_info);
+                    
+                    // Auto-calculate
+                    calculate();
+                } else {
+                    modelDetails.textContent = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                modelDetails.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        // Display model parameters
+        function displayModelParameters(modelInfo) {
+            const modelParameters = document.getElementById('model_parameters');
+            const parameterGrid = document.getElementById('parameter_grid');
+            
+            let html = '';
+            
+            // Basic parameters
+            const basicParams = [
+                { label: 'Total Parameters', value: modelInfo.total_parameters_formatted },
+                { label: 'Model Type', value: modelInfo.model_type.toUpperCase() },
+                { label: 'Layers', value: modelInfo.num_layers },
+                { label: 'Hidden Size', value: modelInfo.hidden_size },
+                { label: 'Attention Heads', value: modelInfo.num_attention_heads },
+                { label: 'KV Heads', value: modelInfo.num_key_value_heads },
+                { label: 'Intermediate Size', value: modelInfo.intermediate_size },
+                { label: 'Vocab Size', value: modelInfo.vocab_size.toLocaleString() },
+                { label: 'Data Type', value: modelInfo.dtype.toUpperCase() },
+                { label: 'Sequence Length', value: modelInfo.sequence_length },
+                { label: 'Batch Size', value: modelInfo.batch_size }
+            ];
+            
+            basicParams.forEach(param => {
+                html += `
+                    <div class="parameter-item">
+                        <div class="parameter-label">${param.label}</div>
+                        <div class="parameter-value">${param.value}</div>
+                    </div>
+                `;
+            });
+            
+            // MoE parameters if applicable
+            if (modelInfo.model_type === 'moe') {
+                const moeParams = [
+                    { label: 'Experts', value: modelInfo.num_experts },
+                    { label: 'Top-K', value: modelInfo.top_k },
+                    { label: 'Capacity Factor', value: modelInfo.expert_capacity_factor },
+                    { label: 'MoE Intermediate Size', value: modelInfo.moe_intermediate_size }
+                ];
+                
+                moeParams.forEach(param => {
+                    html += `
+                        <div class="parameter-item">
+                            <div class="parameter-label">${param.label}</div>
+                            <div class="parameter-value">${param.value}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            parameterGrid.innerHTML = html;
+            modelParameters.style.display = 'block';
+        }
+        
+        // Populate form with configuration
+        function populateForm(config) {
+            document.getElementById('model_type').value = config.model_type;
+            document.getElementById('num_layers').value = config.num_layers;
+            document.getElementById('hidden_size').value = config.hidden_size;
+            document.getElementById('num_attention_heads').value = config.num_attention_heads;
+            document.getElementById('intermediate_size').value = config.intermediate_size;
+            document.getElementById('vocab_size').value = config.vocab_size;
+            document.getElementById('dtype').value = config.dtype;
+            
+            if (config.model_type === 'moe') {
+                document.getElementById('num_experts').value = config.num_experts;
+                document.getElementById('top_k').value = config.top_k;
+                document.getElementById('expert_capacity_factor').value = config.expert_capacity_factor;
+            }
+            
+            // Toggle MoE parameters if needed
+            toggleMoEParams();
+        }
+        
+        // Calculate function
+        async function calculate() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading">Calculating...</div>';
+            
+            try {
+                const data = {
+                    model_type: document.getElementById('model_type').value,
+                    num_layers: parseInt(document.getElementById('num_layers').value),
+                    hidden_size: parseInt(document.getElementById('hidden_size').value),
+                    num_attention_heads: parseInt(document.getElementById('num_attention_heads').value),
+                    intermediate_size: parseInt(document.getElementById('intermediate_size').value),
+                    vocab_size: parseInt(document.getElementById('vocab_size').value),
+                    dtype: document.getElementById('dtype').value,
+                    sequence_length: parseInt(document.getElementById('sequence_length').value),
+                    batch_size: parseInt(document.getElementById('batch_size').value),
+                    mode: document.getElementById('mode').value,
+                    decode_len: parseInt(document.getElementById('decode_len').value),
+                    num_experts: parseInt(document.getElementById('num_experts').value),
+                    top_k: parseInt(document.getElementById('top_k').value),
+                    expert_capacity_factor: parseFloat(document.getElementById('expert_capacity_factor').value)
+                };
+                
+                const response = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayResults(result.results);
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Display results
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            
+            // Calculate percentages for memory components
+            const memoryTotal = results.memory.total;
+            const memoryComponents = [
+                { name: 'Attention', value: results.memory.attention },
+                { name: 'Projections', value: results.memory.projections },
+                { name: 'MLP', value: results.memory.mlp },
+                { name: 'Embeddings', value: results.memory.embeddings },
+                { name: 'Layer Norm', value: results.memory.layer_norm },
+                { name: 'Weights', value: results.memory.weights },
+                { name: 'KV Cache', value: results.memory.kv_cache }
+            ];
+            
+            // Calculate percentages for FLOPS components
+            const flopsTotal = results.flops.total;
+            const flopsComponents = [
+                { name: 'Attention', value: results.flops.attention },
+                { name: 'Projections', value: results.flops.projections },
+                { name: 'MLP', value: results.flops.mlp },
+                { name: 'Embeddings', value: results.flops.embeddings },
+                { name: 'Layer Norm', value: results.flops.layer_norm }
+            ];
+            
+            let html = `
+                <div class="success">Calculation completed successfully!</div>
+                
+                <div class="result-card">
+                    <h3>Model Information</h3>
+                    <div class="parameter-grid">
+                        <div class="parameter-item">
+                            <div class="parameter-label">Total Parameters</div>
+                            <div class="parameter-value">${results.model_info.total_parameters_formatted}</div>
+                        </div>
+                        <div class="parameter-item">
+                            <div class="parameter-label">Model Type</div>
+                            <div class="parameter-value">${results.model_info.model_type.toUpperCase()}</div>
+                        </div>
+                        <div class="parameter-item">
+                            <div class="parameter-label">Layers</div>
+                            <div class="parameter-value">${results.model_info.num_layers}</div>
+                        </div>
+                        <div class="parameter-item">
+                            <div class="parameter-label">Hidden Size</div>
+                            <div class="parameter-value">${results.model_info.hidden_size}</div>
+                        </div>
+                        <div class="parameter-item">
+                            <div class="parameter-label">Data Type</div>
+                            <div class="parameter-value">${results.model_info.dtype.toUpperCase()}</div>
+                        </div>
+                        <div class="parameter-item">
+                            <div class="parameter-label">Operation Mode</div>
+                            <div class="parameter-value">${results.model_info.mode.toUpperCase()}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h3>Memory Usage</h3>
+                    <div class="result-value">${formatBytes(memoryTotal)}</div>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Value</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            memoryComponents.forEach(component => {
+                const percentage = ((component.value / memoryTotal) * 100).toFixed(1);
+                html += `
+                    <tr>
+                        <td>${component.name}</td>
+                        <td>${formatBytes(component.value)}</td>
+                        <td>${percentage}%</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="result-card">
+                    <h3>FLOPS</h3>
+                    <div class="result-value">${formatFLOPS(flopsTotal)}</div>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Value</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            flopsComponents.forEach(component => {
+                const percentage = ((component.value / flopsTotal) * 100).toFixed(1);
+                html += `
+                    <tr>
+                        <td>${component.name}</td>
+                        <td>${formatFLOPS(component.value)}</td>
+                        <td>${percentage}%</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="result-card">
+                    <h3>Arithmetic Intensity (Reuse)</h3>
+                    <div class="result-value">${formatReuse(results.reuse.total)}</div>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Stage</th>
+                                <th>Value</th>
+                                <th>Efficiency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Pre-Attention</td>
+                                <td>${formatReuse(results.reuse.pre_attention)}</td>
+                                <td>${results.reuse.pre_attention > 100 ? 'High' : results.reuse.pre_attention > 10 ? 'Medium' : 'Low'}</td>
+                            </tr>
+                            <tr>
+                                <td>Attention</td>
+                                <td>${formatReuse(results.reuse.attention)}</td>
+                                <td>${results.reuse.attention > 100 ? 'High' : results.reuse.attention > 10 ? 'Medium' : 'Low'}</td>
+                            </tr>
+                            <tr>
+                                <td>Post-Attention</td>
+                                <td>${formatReuse(results.reuse.post_attention)}</td>
+                                <td>${results.reuse.post_attention > 100 ? 'High' : results.reuse.post_attention > 10 ? 'Medium' : 'Low'}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="result-details" style="margin-top: 10px; font-style: italic; color: #6c757d;">
+                        Higher values indicate better compute efficiency
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Benchmark function
+        async function runBenchmark() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading">Running benchmark...</div>';
+            
+            try {
+                const response = await fetch('/api/benchmark', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayBenchmarkResults(result.results);
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Display benchmark results
+        function displayBenchmarkResults(results) {
+            const resultsDiv = document.getElementById('results');
+            
+            let html = `
+                <div class="success">Benchmark completed successfully!</div>
+                <h3>Benchmark Results</h3>
+            `;
+            
+            results.forEach(result => {
+                html += `
+                    <div class="result-card">
+                        <h3>${result.model_name}</h3>
+                        <div class="result-value">Accuracy: ${(result.accuracy_score * 100).toFixed(1)}%</div>
+                        <table class="results-table">
+                            <tr>
+                                <td>Execution Time</td>
+                                <td>${result.execution_time.toFixed(3)}s</td>
+                            </tr>
+                            <tr>
+                                <td>Memory</td>
+                                <td>${formatBytes(result.memory_gb * 1e9)}</td>
+                            </tr>
+                            <tr>
+                                <td>FLOPS</td>
+                                <td>${formatFLOPS(result.flops_tflop * 1e12)}</td>
+                            </tr>
+                            <tr>
+                                <td>Arithmetic Intensity</td>
+                                <td>${formatReuse(result.reuse)}</td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Utility functions
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+        
+        function formatFLOPS(flops) {
+            if (flops === 0) return '0 FLOP';
+            const k = 1000;
+            const sizes = ['FLOP', 'KFLOP', 'MFLOP', 'GFLOP', 'TFLOP', 'PFLOP', 'EFLOP'];
+            const i = Math.floor(Math.log(flops) / Math.log(k));
+            return parseFloat((flops / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+        
+        function formatReuse(reuse) {
+            if (reuse === 0) return '0 FLOPS/B';
+            if (reuse < 1) return reuse.toFixed(3) + ' FLOPS/B';
+            if (reuse < 1000) return reuse.toFixed(1) + ' FLOPS/B';
+            if (reuse < 1000000) return (reuse / 1000).toFixed(1) + ' KFLOPS/B';
+            return (reuse / 1000000).toFixed(1) + ' MFLOPS/B';
+        }
+        
+        // Initialize
+        toggleMoEParams();
+    </script>
+</body>
+</html>
+
