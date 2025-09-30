@@ -76,12 +76,22 @@ def get_hardware_comparison(model_memory_gb: float, model_flops: float,
     Args:
         model_memory_gb: Model memory requirement in GB
         model_flops: Model FLOPS requirement
-        data_type: Data type for FLOPS comparison ("fp16" or "fp32")
+        data_type: Data type for FLOPS comparison ("fp16", "fp32", "bf16", etc.)
     
     Returns:
         Dictionary with hardware comparison results
     """
-    flops_key = f"flops_{data_type}"
+    # Map data types to available FLOPS attributes
+    dtype_mapping = {
+        'fp16': 'flops_fp16',
+        'fp32': 'flops_fp32',
+        'bf16': 'flops_fp16',  # BF16 uses similar FLOPS as FP16
+        'int8': 'flops_fp16',  # Use FP16 as approximation
+        'int4': 'flops_fp16',  # Use FP16 as approximation
+        'fp8': 'flops_fp16'    # Use FP16 as approximation
+    }
+    
+    flops_key = dtype_mapping.get(data_type, 'flops_fp16')
     
     results = {}
     
