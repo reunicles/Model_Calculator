@@ -648,7 +648,7 @@ class ConfigBuilder:
             hp_seq_len=overrides.get('hp_seq_len', base_config.hp_seq_len),
             batch_size=overrides.get('batch_size', base_config.batch_size),
             decode_len=overrides.get('decode_len', base_config.decode_len),
-            dtype_bytes=overrides.get('dtype_bytes', base_config.dtype_bytes),
+            dtype=overrides.get('dtype', base_config.dtype),
             use_flash_attention=overrides.get('use_flash_attention', base_config.use_flash_attention),
             use_flash_decode=overrides.get('use_flash_decode', base_config.use_flash_decode),
             flash_attention_block_size=overrides.get('flash_attention_block_size', base_config.flash_attention_block_size),
@@ -1350,10 +1350,12 @@ class PrefillStrategy(CalculationStrategy):
     
     def _calculate_kv_cache_memory(self, context: CalculationContext) -> float:
         """Calculate KV cache memory for prefill mode"""
-        # KV cache stores key and value matrices for each layer
-        # For prefill mode, KV cache stores the full sequence length
-        kv_size = context.hidden_size * context.dtype_bytes
-        return context.num_layers * context.seq_len * context.batch_size * kv_size * 2
+        # KV cache stores key and value tensors per layer: K and V
+        # per layer per batch: 2 * num_kv_heads * seq_len * head_dim * dtype_bytes
+        head_dim = context.hidden_size // context.num_heads
+        kv_cache_per_layer = 2 * context.num_kv_heads * context.seq_len * head_dim * context.dtype_bytes
+        total = context.num_layers * kv_cache_per_layer * context.batch_size
+        return total
     
     def _calculate_forward_flops(self, context: CalculationContext) -> FLOPSComponents:
         """Calculate forward pass FLOPS"""
@@ -1461,17 +1463,17 @@ class DecodeStrategy(CalculationStrategy):
     
     def calculate_flops(self, context: CalculationContext) -> FLOPSComponents:
         """Calculate decode FLOPS"""
-        # For decode, we need to calculate FLOPS for generating decode_len tokens
-        # Each token generation requires forward pass FLOPS
-        step_flops = self._calculate_decode_step_flops(context)
-        
-        # Scale by decode length (not seq_len which is 1 for decode mode)
+        # Report FLOPS for the last token only (effective context length)
+        effective_len = self.config.sequence_length + max(self.config.decode_len - 1, 0)
+        last_step_config = ConfigBuilder.for_decode(self.config, effective_len)
+        tc = TransformerCalculator(last_step_config)
+        step_flops = tc._calculate_decode_step_flops(last_step_config)
         return FLOPSComponentsBuilder() \
-            .add_attention(step_flops.attention * self.config.decode_len) \
-            .add_projections(step_flops.projections * self.config.decode_len) \
-            .add_mlp(step_flops.mlp * self.config.decode_len) \
-            .add_embeddings(step_flops.embeddings * self.config.decode_len) \
-            .add_layer_norm(step_flops.layer_norm * self.config.decode_len) \
+            .add_attention(step_flops.attention) \
+            .add_projections(step_flops.projections) \
+            .add_mlp(step_flops.mlp) \
+            .add_embeddings(step_flops.embeddings) \
+            .add_layer_norm(step_flops.layer_norm) \
             .build()
     
     def calculate_reuse(self, context: CalculationContext) -> ReuseComponents:
@@ -1534,13 +1536,14 @@ class DecodeStrategy(CalculationStrategy):
     
     def _calculate_kv_cache_memory(self, context: CalculationContext) -> float:
         """Calculate KV cache memory"""
-        # KV cache stores key and value matrices for each layer
-        # For decode mode, KV cache stores the FULL sequence length, not just 1 token
-        kv_size = context.hidden_size * context.dtype_bytes
-        
-        # Use the original sequence length from config, not the decode context length
-        full_seq_len = self.config.sequence_length
-        return context.num_layers * full_seq_len * context.batch_size * kv_size * 2
+        # KV cache stores key and value matrices for each layer across all past tokens
+        # Use effective context length at the last token of decode
+        effective_len = self.config.sequence_length + max(self.config.decode_len - 1, 0)
+        head_dim = context.hidden_size // context.num_heads
+        num_kv_heads = context.num_kv_heads
+        kv_cache_per_layer = 2 * num_kv_heads * effective_len * head_dim * context.dtype_bytes
+        total_kv_cache = context.num_layers * kv_cache_per_layer * context.batch_size
+        return total_kv_cache
     
     def _calculate_decode_attention_reuse(self, memory_components: MemoryComponents, flops_components: FLOPSComponents) -> float:
         """Calculate arithmetic intensity for attention stage in decode mode"""
@@ -1779,8 +1782,8 @@ class TransformerCalculator:
     def _calculate_decode_memory(self) -> MemoryComponents:
         """Calculate memory for decode phase (auto-regressive generation) with Flash Decode"""
         # For decode, we need to account for the peak memory usage during auto-regressive generation
-        # This occurs when processing the full context length (sequence_length + decode_len)
-        total_context_length = self.config.sequence_length + self.config.decode_len
+        # This occurs at the last token: sequence_length + decode_len - 1
+        total_context_length = self.config.sequence_length + max(self.config.decode_len - 1, 0)
         
         # Create config for the peak context length
         decode_config = ConfigBuilder.for_decode(self.config, total_context_length)
@@ -2103,18 +2106,16 @@ class TransformerCalculator:
     
     def _calculate_decode_reuse(self) -> ReuseComponents:
         """Calculate arithmetic intensity for decode phase"""
-        # For decode, we need to account for the peak memory usage
-        total_context_length = self.config.sequence_length + self.config.decode_len
+        # For decode, use effective last-token context length
+        total_context_length = self.config.sequence_length + max(self.config.decode_len - 1, 0)
         
         # Create config for the peak context length
         decode_config = ConfigBuilder.for_decode(self.config, total_context_length)
         
         decode_calc = TransformerCalculator(decode_config)
         
-        # Get memory and FLOPS components
+        # Get memory and FLOPS components for the last token
         memory_components = decode_calc._calculate_forward_memory(include_kv_cache=True)
-        
-        # Use decode-specific FLOPS (matrix-vector operations) for consistency
         flops_components = decode_calc._calculate_decode_step_flops(decode_config)
         
         # Calculate reuse for each stage with decode-specific FLOPS
