@@ -33,7 +33,9 @@ try:
     )
     from .hf_model_fetcher import create_model_config_from_hf
 except ImportError:
-    # Fallback for when run as script
+    # Fallback for when run as script - import from src directory
+    import sys
+    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__))))
     from transformer_calculator import (
         TransformerCalculator, ModelConfig, ModelType, OperationMode, DataType,
         DataTypeDetector, calculate_model_parameters
@@ -519,11 +521,9 @@ if __name__ == '__main__':
     print("🌐 Starting Enhanced Transformer Calculator Web Interface")
     print("=" * 60)
     
-    # Find available port (avoiding port 5000 which is used by macOS AirPlay)
-    port = find_available_port(5001)  # Start from 5001 to avoid AirPlay
-    if port is None:
-        print("❌ No available ports found. Please close some applications and try again.")
-        sys.exit(1)
+    # Force port 5001
+    port = 5001
+    print(f"🔧 Forcing port {port}")
     
     print(f"Access the interface at: http://localhost:{port}")
     print(f"API endpoints available at: http://localhost:{port}/api/")
@@ -550,11 +550,9 @@ def main():
     print("🌐 Starting Enhanced Transformer Calculator Web Interface")
     print("=" * 60)
     
-    # Find available port (avoiding port 5000 which is used by macOS AirPlay)
-    port = find_available_port(5001)  # Start from 5001 to avoid AirPlay
-    if port is None:
-        print("❌ No available ports found. Please close some applications and try again.")
-        sys.exit(1)
+    # Force port 5001
+    port = 5001
+    print(f"🔧 Forcing port {port}")
     
     print(f"Access the interface at: http://localhost:{port}")
     print(f"API endpoints available at: http://localhost:{port}/api/")

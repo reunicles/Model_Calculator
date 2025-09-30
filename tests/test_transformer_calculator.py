@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+
+# Fix imports for project structure
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+
 """
 Unit Tests for Transformer Calculator
 

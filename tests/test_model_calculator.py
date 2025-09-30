@@ -1,3 +1,9 @@
+
+# Fix imports for project structure
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+
 """
 Test suite for the Model Calculator project.
 

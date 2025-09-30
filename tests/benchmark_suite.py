@@ -13,6 +13,10 @@ from dataclasses import dataclass
 from pathlib import Path
 import sys
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+
 from transformer_calculator import (
     TransformerCalculator, ModelConfig, ModelType, OperationMode, DataType,
     MemoryComponents, FLOPSComponents, ReuseComponents

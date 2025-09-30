@@ -63,7 +63,10 @@ Attention Heads: {self.config.num_attention_heads} (KV: {self.config.num_key_val
     def _calculate_total_parameters(self) -> int:
         """Calculate total model parameters"""
         # Import here to avoid circular imports
-        from transformer_calculator import calculate_model_parameters
+        try:
+            from .transformer_calculator import calculate_model_parameters
+        except ImportError:
+            from transformer_calculator import calculate_model_parameters
         return calculate_model_parameters(self.config)
     
     def _format_parameters_human(self, param_count: int) -> str:

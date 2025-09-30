@@ -108,11 +108,11 @@ def get_hardware_comparison(model_memory_gb: float, model_flops: float,
         overall_fits = memory_fits and flops_fits
         
         # Calculate replicas needed to saturate hardware
-        # Replicas = floor(100% / bottleneck_utilization), capped at 100
-        bottleneck_utilization = min(memory_ratio, flops_ratio)
-        if bottleneck_utilization > 0:
+        # Replicas = Truncate(100 / Max(Memory%, FLOPS%))
+        max_utilization = max(memory_ratio, flops_ratio)
+        if max_utilization > 0:
             import math
-            replicas_needed = min(math.floor(1.0 / bottleneck_utilization), 100)
+            replicas_needed = math.floor(1.0 / max_utilization)
         else:
             replicas_needed = "N/A"  # Division by zero case
         
@@ -160,6 +160,7 @@ def format_hardware_summary(comparison_results: Dict[str, Any]) -> str:
             lines.append(f"{result['name']}: {status}")
             lines.append(f"  Memory: {result['memory_utilization']} of {result['memory_gb']:.0f} GB")
             lines.append(f"  FLOPS:  {result['flops_utilization']} of {result['flops']/1e15:.1f} PFLOPS")
+            lines.append(f"  Replicas: {result['replicas_needed']} needed to saturate hardware")
             lines.append("")
     
     # Node-level comparisons
@@ -173,6 +174,7 @@ def format_hardware_summary(comparison_results: Dict[str, Any]) -> str:
             lines.append(f"{result['name']}: {status}")
             lines.append(f"  Memory: {result['memory_utilization']} of {result['memory_gb']:.0f} GB")
             lines.append(f"  FLOPS:  {result['flops_utilization']} of {result['flops']/1e15:.1f} PFLOPS")
+            lines.append(f"  Replicas: {result['replicas_needed']} needed to saturate hardware")
             lines.append("")
     
     # Rack-level comparisons
@@ -186,6 +188,7 @@ def format_hardware_summary(comparison_results: Dict[str, Any]) -> str:
             lines.append(f"{result['name']}: {status}")
             lines.append(f"  Memory: {result['memory_utilization']} of {result['memory_gb']:.0f} GB")
             lines.append(f"  FLOPS:  {result['flops_utilization']} of {result['flops']/1e15:.1f} PFLOPS")
+            lines.append(f"  Replicas: {result['replicas_needed']} needed to saturate hardware")
             lines.append("")
     
     # Summary recommendations
@@ -236,7 +239,8 @@ def get_hardware_json(comparison_results: Dict[str, Any]) -> Dict[str, Any]:
             "flops_fits": result["flops_fits"],
             "overall_fits": result["overall_fits"],
             "memory_utilization": result["memory_utilization"],
-            "flops_utilization": result["flops_utilization"]
+            "flops_utilization": result["flops_utilization"],
+            "replicas_needed": result["replicas_needed"]
         }
     
     return json_results

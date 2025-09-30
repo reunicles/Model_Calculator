@@ -1202,7 +1202,11 @@ class PretrainingStrategy(CalculationStrategy):
     def _calculate_weights_memory(self, context: CalculationContext) -> float:
         """Calculate model weights memory"""
         # Use the correct total parameters calculation
-        from transformer_calculator import calculate_model_parameters
+        try:
+            from .transformer_calculator import calculate_model_parameters
+        except ImportError:
+            # Fallback for when run as script
+            from transformer_calculator import calculate_model_parameters
         total_params = calculate_model_parameters(self.config)
         return total_params * context.dtype_bytes
     
@@ -1376,7 +1380,11 @@ class PrefillStrategy(CalculationStrategy):
     def _calculate_weights_memory(self, context: CalculationContext) -> float:
         """Calculate model weights memory"""
         # Use the correct total parameters calculation
-        from transformer_calculator import calculate_model_parameters
+        try:
+            from .transformer_calculator import calculate_model_parameters
+        except ImportError:
+            # Fallback for when run as script
+            from transformer_calculator import calculate_model_parameters
         total_params = calculate_model_parameters(self.config)
         return total_params * context.dtype_bytes
     
@@ -1516,7 +1524,11 @@ class DecodeStrategy(CalculationStrategy):
     def _calculate_weights_memory(self, context: CalculationContext) -> float:
         """Calculate model weights memory"""
         # Use the correct total parameters calculation
-        from transformer_calculator import calculate_model_parameters
+        try:
+            from .transformer_calculator import calculate_model_parameters
+        except ImportError:
+            # Fallback for when run as script
+            from transformer_calculator import calculate_model_parameters
         total_params = calculate_model_parameters(self.config)
         return total_params * context.dtype_bytes
     

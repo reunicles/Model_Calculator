@@ -1038,6 +1038,7 @@
                             <div class="hardware-details">
                                 <div>Memory: ${node.memory_utilization} of ${node.memory_gb.toFixed(0)} GB</div>
                                 <div>FLOPS: ${node.flops_utilization} of ${(node.flops/1e15).toFixed(1)} PFLOPS</div>
+                                <div><strong>Replicas:</strong> ${node.replicas_needed} needed to saturate hardware</div>
                             </div>
                         </div>
                     `;
@@ -1054,6 +1055,7 @@
                             <div class="hardware-details">
                                 <div>Memory: ${rack.memory_utilization} of ${rack.memory_gb.toFixed(0)} GB</div>
                                 <div>FLOPS: ${rack.flops_utilization} of ${(rack.flops/1e15).toFixed(1)} PFLOPS</div>
+                                <div><strong>Replicas:</strong> ${rack.replicas_needed} needed to saturate hardware</div>
                             </div>
                         </div>
                     `;
@@ -1069,6 +1071,7 @@
                             <div class="hardware-details">
                                 <div>Memory: ${rack.memory_utilization} of ${rack.memory_gb.toFixed(0)} GB</div>
                                 <div>FLOPS: ${rack.flops_utilization} of ${(rack.flops/1e15).toFixed(1)} PFLOPS</div>
+                                <div><strong>Replicas:</strong> ${rack.replicas_needed} needed to saturate hardware</div>
                             </div>
                         </div>
                     `;
