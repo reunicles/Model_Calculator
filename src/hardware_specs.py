@@ -108,11 +108,11 @@ def get_hardware_comparison(model_memory_gb: float, model_flops: float,
         overall_fits = memory_fits and flops_fits
         
         # Calculate replicas needed to saturate hardware
-        # Replicas = ceil(100% / bottleneck_utilization), capped at 100
+        # Replicas = floor(100% / bottleneck_utilization), capped at 100
         bottleneck_utilization = min(memory_ratio, flops_ratio)
         if bottleneck_utilization > 0:
             import math
-            replicas_needed = min(math.ceil(1.0 / bottleneck_utilization), 100)
+            replicas_needed = min(math.floor(1.0 / bottleneck_utilization), 100)
         else:
             replicas_needed = "N/A"  # Division by zero case
         
