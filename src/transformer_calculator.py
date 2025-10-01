@@ -73,7 +73,16 @@ def calculate_model_parameters(config: 'ModelConfig') -> int:
     if config.model_type == ModelType.MOE:
         # For MoE, use moe_intermediate_size if available, otherwise fall back to intermediate_size
         moe_size = config.moe_intermediate_size if config.moe_intermediate_size is not None else intermediate_size
-        mlp_params = config.num_experts * 2 * hidden_size * moe_size
+        
+        # Regular routed experts
+        routed_experts = config.num_experts
+        routed_mlp_params = routed_experts * 2 * hidden_size * moe_size
+        
+        # Shared experts (if any)
+        shared_experts = getattr(config, 'num_shared_experts', 0)
+        shared_mlp_params = shared_experts * 2 * hidden_size * moe_size
+        
+        mlp_params = routed_mlp_params + shared_mlp_params
     else:
         mlp_params = 2 * hidden_size * intermediate_size
     
@@ -84,6 +93,29 @@ def calculate_model_parameters(config: 'ModelConfig') -> int:
     total_params = embedding_params + num_layers * per_layer_params
     
     return total_params
+
+
+def validate_parameters_with_hf_metadata(config: 'ModelConfig', repo_id: str, 
+                                       tolerance_percent: float = 20.0) -> Dict[str, Any]:
+    """
+    Validate calculated parameters against Hugging Face metadata.
+    
+    Args:
+        config: Model configuration
+        repo_id: Hugging Face model ID
+        tolerance_percent: Allowed discrepancy percentage
+        
+    Returns:
+        Dictionary with validation results
+    """
+    try:
+        from .hf_metadata_parser import validate_model_parameters
+    except ImportError:
+        # Fallback for when run as script
+        from hf_metadata_parser import validate_model_parameters
+    
+    calculated_params = calculate_model_parameters(config)
+    return validate_model_parameters(repo_id, calculated_params, tolerance_percent)
 
 
 class ModelType(Enum):
@@ -689,6 +721,7 @@ class ModelConfig:
     expert_capacity_factor: float = 1.0
     top_k: int = 1
     moe_intermediate_size: Optional[int] = None  # For MoE expert size
+    num_shared_experts: int = 0  # Shared experts (used by all tokens)
     
     # Sequence parameters
     sequence_length: int = 2048  # For prefill and decode modes
@@ -773,10 +806,12 @@ class ModelConfig:
         if is_moe:
             num_experts, top_k = cls._extract_moe_params(config_to_use)
             moe_intermediate_size = config_to_use.get('moe_intermediate_size', intermediate_size)
+            num_shared_experts = config_to_use.get('n_shared_experts', 0)
             model_type = ModelType.MOE
         else:
             num_experts, top_k = 1, 1
             moe_intermediate_size = None
+            num_shared_experts = 0
             model_type = ModelType.DENSE
         
         # Print warnings if any
@@ -804,6 +839,7 @@ class ModelConfig:
             expert_capacity_factor=config_to_use.get('expert_capacity_factor', 1.0),
             top_k=top_k,
             moe_intermediate_size=moe_intermediate_size,
+            num_shared_experts=num_shared_experts,
             sequence_length=sequence_length,
             batch_size=batch_size,
             decode_len=decode_len,

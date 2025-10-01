@@ -189,9 +189,11 @@ class HFModelFetcher:
             if is_moe:
                 num_experts, top_k = self._extract_moe_params(text_config)
                 moe_intermediate_size = text_config.get('moe_intermediate_size', intermediate_size)
+                num_shared_experts = text_config.get('n_shared_experts', 0)
             else:
                 num_experts, top_k = 1, 1
                 moe_intermediate_size = None
+                num_shared_experts = 0
                 
             expert_capacity_factor = text_config.get('expert_capacity_factor', 1.0)
             
@@ -218,9 +220,11 @@ class HFModelFetcher:
             if is_moe:
                 num_experts, top_k = hf_info.num_experts, hf_info.top_k
                 moe_intermediate_size = config.get('moe_intermediate_size', intermediate_size)
+                num_shared_experts = config.get('n_shared_experts', 0)
             else:
                 num_experts, top_k = 1, 1
                 moe_intermediate_size = None
+                num_shared_experts = 0
                 
             expert_capacity_factor = config.get('expert_capacity_factor', 1.0)
         
@@ -292,6 +296,7 @@ class HFModelFetcher:
             expert_capacity_factor=expert_capacity_factor,
             top_k=top_k,
             moe_intermediate_size=moe_intermediate_size,
+            num_shared_experts=num_shared_experts,
             sequence_length=sequence_length,
             batch_size=batch_size,
             decode_len=decode_len,
