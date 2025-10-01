@@ -453,7 +453,62 @@ Modern attention mechanisms use various optimization strategies to reduce memory
 - Implement MLA latent embedding calculations
 - Add memory bandwidth analysis for different attention patterns
 
-### 3. Additional Planned Features
+### 3. Provisioning a GB300 Rack (Inference)
+**Planned Work**: End-to-end rack-level provisioning and throughput planning using our calculator outputs
+
+We will extend the calculator to reason about provisioning a NVIDIA GB300 rack for real inference workloads. The goal is to pick a representative model and produce a rack plan that balances prefill vs. decode, selects parallelism strategies, and estimates achievable replicas and tokens-per-second.
+
+#### Scenario Setup
+- **Model Choice**: Start with a large MoE model (e.g., `deepseek-ai/DeepSeek-V3.1-Terminus`, 685B with shared experts) and a large dense baseline (e.g., `Qwen2.5-72B`) to contrast memory/compute footprints.
+- **Input Mix**: Define a realistic request distribution: sequence length at prefill (S_prefill), average generated length at decode (S_decode), batch size distribution, and concurrency target.
+- **Hardware Envelope**: GB300 node and rack (HBM capacity, GPU count/topology, interconnect bandwidth, host memory/PCIe/NVLink/NVSwitch characteristics). We will encode this as a simple "rack profile" schema.
+
+#### Methodology (Built on our current work)
+1. **Prefill vs. Decode Disaggregation**
+   - Use `Math_Used.md` master equations and our implementation to compute FLOPS, memory bytes moved, and arithmetic intensity separately for prefill and decode.
+   - Apply Flash Attention/Flash Decode switches to reflect O(S) and O(1) memory optimizations when enabled.
+   - Use KV cache formulas to dimension HBM usage and bandwidth during decode.
+
+2. **Parallelism Strategy Selection**
+   - Combine: data parallelism (DP), tensor/model parallelism (TP), pipeline parallelism (PP), sequence parallelism (SP), and expert parallelism (EP) for MoE.
+   - Heuristics tied to our metrics:
+     - If attention memory dominates prefill: favor Flash Attention, increase TP to fit activations while maintaining arithmetic intensity.
+     - If KV bandwidth dominates decode: prefer MQA/GQA/MLA options and Flash Decode; adjust DP to maintain per-GPU KV cache residency.
+     - For MoE: set EP to match `top_k`, capacity factor, and expert utilization; ensure shared experts are counted once in weights memory.
+
+3. **Placement & Shaping**
+   - Map layers to PP stages based on per-layer memory/FLOPS from our per-component breakdown.
+   - Choose TP degree to keep per-GPU weight and activation memory within HBM while sustaining target FLOPS utilization (guided by arithmetic intensity ranges in `Math_Used.md`).
+   - Apply EP shards for MoE blocks so active experts fit in GPU memory with minimal cross-GPU traffic.
+
+4. **Throughput Modeling**
+   - Compute tokens/sec for prefill: `TPS_prefill = min(Compute_Bound, Memory_Bound)` using our FLOPS and bytes models.
+   - Compute tokens/sec for decode per replica considering KV cache bandwidth and Flash Decode.
+   - Blend via traffic mix: `TPS = w_prefill × TPS_prefill + w_decode × TPS_decode` for a given request distribution.
+
+5. **Replica Estimation**
+   - Given rack resources and chosen parallelism, determine per-replica GPU count and memory budget.
+   - Derive number of replicas: `replicas = floor( total_GB300_GPU / GPUs_per_replica )` subject to memory and interconnect constraints.
+   - Report aggregate throughput: `TPS_total = replicas × TPS_replica` and expected latency bands.
+
+6. **Validation & Guardrails**
+   - Cross-check calculated parameter counts against Hugging Face metadata (existing validation pipeline).
+   - Verify memory ceilings (HBM, KV cache growth) and interconnect bandwidth are not violated.
+   - Ensure CLI and Web produce identical rack plans (extend the current consistency tests).
+
+#### Deliverables
+- A new CLI/Web mode: `--provision gb300` that accepts model, traffic mix, and precision, then outputs:
+  - Selected DP/TP/PP/SP/EP configuration
+  - Prefill vs. decode resource budgets and bottlenecks
+  - Tokens/sec per replica and aggregate, expected latency
+  - Number of deployable replicas on a GB300 rack
+- A "rack profile" YAML to capture GB300 specs and to allow future profiles.
+- Tests that assert identical results between CLI and Web for the same inputs.
+
+#### Why this fits our work
+This plan leverages everything we built: correct parameter validation (including shared MoE experts), Flash Attention/Decode memory models (O(S) and O(1)), accurate FLOPS and bytes accounting, and CLI/Web consistency. The rack planner is a thin layer on top that consumes these metrics to pick parallelism and compute replica counts.
+
+### 4. Additional Planned Features
 - **Dynamic Batching**: Automatic batch size optimization based on memory constraints
 - **Model Parallelism**: Multi-GPU memory and compute distribution analysis
 - **Quantization Support**: INT8/INT4 quantization impact on memory and compute
