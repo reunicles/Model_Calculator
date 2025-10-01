@@ -22,7 +22,9 @@
 ### Master Equations
 ```math
 Prefill FLOPs = L × [5BSd² + 2BS²d]
+
 Decode FLOPs  = L × [5Bd² + 2BdS]
+
 KV Cache     = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × bytes
 ```
 
@@ -72,6 +74,7 @@ KV Cache     = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × bytes
 ### 1. Attention Memory
 ```math
 Standard: S² × B × H × bytes
+
 Flash:    block_size × B × H × bytes × factor
 ```
 
@@ -90,6 +93,7 @@ Flash:    block_size × B × H × bytes × factor
 ### 2. MLP Memory
 ```math
 Dense: 2BSd × d_ff × bytes
+
 MoE:   K × util × 2BSd × d_ff_moe × bytes
 ```
 
@@ -110,6 +114,7 @@ MoE:   K × util × 2BSd × d_ff_moe × bytes
 ### 3. KV Cache
 ```math
 KV_bytes = B × S × H × (d_k + d_v) × bytes
+
 Read/Write = 2 × KV_bytes per token
 ```
 
@@ -179,6 +184,7 @@ util = K / E
 ### MoE Memory Optimization
 ```math
 HBM_Storage = E × 2 × d × d_ff_moe × bytes
+
 GPU_Memory = K × util × 2 × d × d_ff_moe × bytes
 ```
 
@@ -231,6 +237,7 @@ capacity = S × B × K × capacity_factor
 ### KV Cache Optimization
 ```math
 KV_FP16 = B × S × H × (d_k + d_v) × 2
+
 KV_INT8 = B × S × H × (d_k + d_v) × 1
 # 2× memory reduction with INT8
 ```
@@ -251,7 +258,9 @@ KV_INT8 = B × S × H × (d_k + d_v) × 1
 ```math
 # Example: 65K context length
 Standard_Memory = 65K² × B × H × bytes ≈ 4.2B × B × H × bytes
+
 Flash_Memory = 4096 × B × H × bytes × 2.5 ≈ 10K × B × H × bytes
+
 Reduction = 420,000×
 ```
 
