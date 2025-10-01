@@ -161,25 +161,22 @@ class ComponentCalculator:
         # Mode-dependent attention FLOPS calculation
         if context.mode == 'decode':
             # Decode: Memory-bound operation with O(seq_len) FLOPS
-            # Due to KV cache reuse, attention scales linearly with sequence length
-            # For decode: only Q @ K^T computation (K is cached, V is cached)
-            # Q @ K^T: 1 * full_seq_len * batch_size * hidden_size
-            # But we need to divide by 2 since we're only counting one operation
+            # Math_Used.md: L × [5Bd² + 2BdS] for decode
+            # Attention part: 2BdS (Q @ K^T for 1 token against S cached keys)
             full_seq_len = self.config.sequence_length  # Use full sequence length, not context.seq_len
-            attention_flops = 1 * full_seq_len * context.batch_size * context.hidden_size // 2
+            attention_flops = 2 * context.batch_size * context.hidden_size * full_seq_len
         else:
             # Pretraining/Prefill: Compute-bound operation with O(seq_len^2) FLOPS
-            # Full attention computation: Q @ K^T for all positions
-            if self.config.use_flash_attention and context.seq_len > self.config.flash_attention_block_size:
+            # Math_Used.md: L × [5BSd² + 2BS²d] for prefill
+            # Attention part: 2BS²d (Q @ K^T for all positions)
+            if self.config.use_flash_attention and context.seq_len >= self.config.flash_attention_block_size:
                 # Flash Attention: Still O(seq_len^2) FLOPS but with memory optimization
-                attention_scores_flops = context.seq_len * context.seq_len * context.batch_size * context.num_heads * hidden_per_head
-                attention_output_flops = context.seq_len * context.batch_size * context.num_heads * hidden_per_head
-                attention_flops = attention_scores_flops + attention_output_flops
+                # Math_Used.md formula: 2BS²d
+                attention_flops = 2 * context.seq_len * context.seq_len * context.batch_size * context.hidden_size
             else:
                 # Standard attention: O(seq_len^2) FLOPS
-                attention_scores_flops = context.seq_len * context.seq_len * context.batch_size * context.num_heads * hidden_per_head
-                attention_output_flops = context.seq_len * context.batch_size * context.num_heads * hidden_per_head
-                attention_flops = attention_scores_flops + attention_output_flops
+                # Math_Used.md formula: 2BS²d
+                attention_flops = 2 * context.seq_len * context.seq_len * context.batch_size * context.hidden_size
         
         return attention_memory, attention_flops
     
@@ -291,9 +288,14 @@ class ComponentCalculator:
         projection_memory = q_proj_weights + k_proj_weights + v_proj_weights + out_proj_weights
         
         # FLOPS calculation
+        # Math_Used.md: 3BSd² for Q, K, V projections (QKV Projections row)
+        # Q projection: BSd²
         q_flops = context.seq_len * context.batch_size * context.hidden_size * context.hidden_size
+        # K projection: BSd² * kv_scale (for GQA/MQA)
         k_flops = context.seq_len * context.batch_size * context.hidden_size * context.hidden_size * kv_scale
+        # V projection: BSd² * kv_scale (for GQA/MQA)
         v_flops = context.seq_len * context.batch_size * context.hidden_size * context.hidden_size * kv_scale
+        # Output projection: BSd²
         out_flops = context.seq_len * context.batch_size * context.hidden_size * context.hidden_size
         projection_flops = q_flops + k_flops + v_flops + out_flops
         
@@ -327,11 +329,15 @@ class ComponentCalculator:
             mlp_flops = moe_calc.calculate_flops(memory_context)
         else:
             # Dense MLP calculation
+            # Math_Used.md: 2BSdd_ff for MLP (MLP Up + MLP Down rows)
             up_proj = context.seq_len * context.batch_size * context.intermediate_size * context.dtype_bytes
             down_proj = context.seq_len * context.batch_size * context.hidden_size * context.dtype_bytes
             mlp_memory = up_proj + down_proj
             
+            # Math_Used.md: 2BSdd_ff FLOPS for MLP
+            # Up projection: BSdd_ff
             up_flops = context.seq_len * context.batch_size * context.hidden_size * context.intermediate_size
+            # Down projection: BSdd_ff
             down_flops = context.seq_len * context.batch_size * context.intermediate_size * context.hidden_size
             mlp_flops = up_flops + down_flops
         
@@ -1389,11 +1395,12 @@ class PrefillStrategy(CalculationStrategy):
     
     def _calculate_kv_cache_memory(self, context: CalculationContext) -> float:
         """Calculate KV cache memory for prefill mode"""
+        # Math_Used.md: B × S × H × (d_k + d_v) × bytes
         # KV cache stores key and value tensors per layer: K and V
-        # per layer per batch: 2 * num_kv_heads * seq_len * head_dim * dtype_bytes
         head_dim = context.hidden_size // context.num_heads
-        kv_cache_per_layer = 2 * context.num_kv_heads * context.seq_len * head_dim * context.dtype_bytes
-        total = context.num_layers * kv_cache_per_layer * context.batch_size
+        # B × S × H × (d_k + d_v) × bytes per layer
+        kv_cache_per_layer = context.batch_size * context.seq_len * context.num_kv_heads * (head_dim + head_dim) * context.dtype_bytes
+        total = context.num_layers * kv_cache_per_layer
         return total
     
     def _calculate_forward_flops(self, context: CalculationContext) -> FLOPSComponents:
@@ -1575,13 +1582,15 @@ class DecodeStrategy(CalculationStrategy):
     
     def _calculate_kv_cache_memory(self, context: CalculationContext) -> float:
         """Calculate KV cache memory"""
+        # Math_Used.md: B × S × H × (d_k + d_v) × bytes
         # KV cache stores key and value matrices for each layer across all past tokens
         # Use effective context length at the last token of decode
         effective_len = self.config.sequence_length + max(self.config.decode_len - 1, 0)
         head_dim = context.hidden_size // context.num_heads
         num_kv_heads = context.num_kv_heads
-        kv_cache_per_layer = 2 * num_kv_heads * effective_len * head_dim * context.dtype_bytes
-        total_kv_cache = context.num_layers * kv_cache_per_layer * context.batch_size
+        # B × S × H × (d_k + d_v) × bytes per layer
+        kv_cache_per_layer = context.batch_size * effective_len * num_kv_heads * (head_dim + head_dim) * context.dtype_bytes
+        total_kv_cache = context.num_layers * kv_cache_per_layer
         return total_kv_cache
     
     def _calculate_decode_attention_reuse(self, memory_components: MemoryComponents, flops_components: FLOPSComponents) -> float:
@@ -2289,21 +2298,12 @@ class TransformerCalculator:
         intermediate_size = step_config.intermediate_size
         num_layers = step_config.num_layers
         
-        # Attention FLOPS: matrix-vector operations (O(seq_len))
-        # Q, K, V projections: 3 * batch_size * hidden_size^2 (matrix-vector)
-        qkv_flops = 3 * batch_size * hidden_size * hidden_size
+        # Math_Used.md: L × [5Bd² + 2BdS] for decode
+        # Attention FLOPS: 2BdS (Q @ K^T for 1 token against S cached keys)
+        attention_flops = 2 * batch_size * hidden_size * seq_len
         
-        # Attention scores: batch_size * num_heads * seq_len * head_dim (matrix-vector)
-        head_dim = hidden_size // num_heads
-        attention_scores_flops = batch_size * num_heads * seq_len * head_dim
-        
-        # Attention output: batch_size * hidden_size^2 (matrix-vector)
-        attention_output_flops = batch_size * hidden_size * hidden_size
-        
-        attention_flops = qkv_flops + attention_scores_flops + attention_output_flops
-        
-        # Projection FLOPS: Q, K, V, output projections (matrix-vector)
-        # Q projection (full size)
+        # Projection FLOPS: 3Bd² (Q, K, V projections for 1 token)
+        # Q projection: Bd²
         q_flops = batch_size * hidden_size * hidden_size
         
         # K, V projections (scaled by num_kv_heads for GQA/MQA)
@@ -2311,19 +2311,19 @@ class TransformerCalculator:
         k_flops = batch_size * hidden_size * hidden_size * kv_scale
         v_flops = batch_size * hidden_size * hidden_size * kv_scale
         
-        # Output projection
+        # Output projection: Bd²
         out_flops = batch_size * hidden_size * hidden_size
         
         projection_flops = q_flops + k_flops + v_flops + out_flops
         
-        # MLP FLOPS: matrix-vector operations
+        # MLP FLOPS: 2Bd² (Up + Down projections for 1 token)
         if step_config.model_type == ModelType.MOE:
             # MoE: routing + expert computation
             routing_flops = batch_size * step_config.num_experts * hidden_size
             expert_flops = step_config.top_k * batch_size * hidden_size * intermediate_size
             mlp_flops = routing_flops + expert_flops
         else:
-            # Dense: 2 * batch_size * hidden_size * intermediate_size (matrix-vector)
+            # Dense: 2Bd² (Up + Down projections)
             mlp_flops = 2 * batch_size * hidden_size * intermediate_size
         
         # Embedding FLOPS: matrix-vector operations

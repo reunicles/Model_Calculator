@@ -1,0 +1,343 @@
+{
+  "start_time": 1759289313.801634,
+  "benchmark_suite": {
+    "total_tests": 5,
+    "average_accuracy": 1.0,
+    "average_execution_time": 5.469322204589844e-05,
+    "passed_tests": 5
+  },
+  "real_world_validation": {
+    "total_tests": 6,
+    "successful_tests": 5,
+    "success_rate": 83.33333333333334,
+    "average_execution_time": 0.33594722747802735
+  },
+  "performance_profiling": {
+    "calculator_performance": {
+      "prefill": {
+        "execution_time": 0.0002009868621826172,
+        "memory_peak_mb": 36.671875,
+        "memory_avg_mb": 36.671875,
+        "cpu_usage": 0.4,
+        "memory_total_gb": 26.83830272,
+        "flops_total_tflop": 11.442866618368,
+        "reuse_total": 3113.3807728902743,
+        "memory_breakdown": {
+          "attention": 9.126805504,
+          "projections": 4.294967296,
+          "mlp": 1.979711488,
+          "embeddings": 0.033554432,
+          "layer_norm": 0.000524288,
+          "weights": 10.328997888,
+          "kv_cache": 1.073741824
+        }
+      },
+      "decode": {
+        "execution_time": 0.0004749298095703125,
+        "memory_peak_mb": 36.671875,
+        "memory_avg_mb": 36.671875,
+        "cpu_usage": 0.8,
+        "memory_total_gb": 15.734603776,
+        "flops_total_tflop": 0.005717884928,
+        "reuse_total": 1935.678872810914,
+        "memory_breakdown": {
+          "attention": 0.002359296,
+          "projections": 4.294967296,
+          "mlp": 0.000966656,
+          "embeddings": 1.6384e-05,
+          "layer_norm": 0.000524288,
+          "weights": 10.328997888,
+          "kv_cache": 1.106771968
+        }
+      }
+    },
+    "scaling_performance": {
+      "0.5x": {
+        "scale_factor": 0.5,
+        "execution_time": 0.0004150867462158203,
+        "memory_peak_mb": 36.671875,
+        "memory_total_gb": 13.567000576,
+        "flops_total_tflop": 5.738613178368,
+        "config": {
+          "layers": 16,
+          "hidden_size": 4096,
+          "intermediate_size": 11008
+        }
+      },
+      "1.0x": {
+        "scale_factor": 1.0,
+        "execution_time": 0.0003829002380371094,
+        "memory_peak_mb": 36.671875,
+        "memory_total_gb": 26.83830272,
+        "flops_total_tflop": 11.442866618368,
+        "config": {
+          "layers": 32,
+          "hidden_size": 4096,
+          "intermediate_size": 11008
+        }
+      },
+      "2.0x": {
+        "scale_factor": 2.0,
+        "execution_time": 0.00029277801513671875,
+        "memory_peak_mb": 36.671875,
+        "memory_total_gb": 53.380907008,
+        "flops_total_tflop": 22.851373498368,
+        "config": {
+          "layers": 64,
+          "hidden_size": 4096,
+          "intermediate_size": 11008
+        }
+      },
+      "4.0x": {
+        "scale_factor": 4.0,
+        "execution_time": 0.0005769729614257812,
+        "memory_peak_mb": 36.6875,
+        "memory_total_gb": 1115.206713344,
+        "flops_total_tflop": 677.866098393088,
+        "config": {
+          "layers": 128,
+          "hidden_size": 16384,
+          "intermediate_size": 44032
+        }
+      }
+    },
+    "data_type_performance": {
+      "fp32": {
+        "dtype": "fp32",
+        "dtype_bytes": 4.0,
+        "execution_time": 0.0002529621124267578,
+        "memory_peak_mb": 36.6875,
+        "memory_total_gb": 53.67660544,
+        "flops_total_tflop": 11.442866618368,
+        "memory_reduction_factor": 1.0
+      },
+      "fp16": {
+        "dtype": "fp16",
+        "dtype_bytes": 2.0,
+        "execution_time": 0.0003032684326171875,
+        "memory_peak_mb": 36.6875,
+        "memory_total_gb": 26.83830272,
+        "flops_total_tflop": 11.442866618368,
+        "memory_reduction_factor": 2.0
+      },
+      "bf16": {
+        "dtype": "bf16",
+        "dtype_bytes": 2.0,
+        "execution_time": 0.00026297569274902344,
+        "memory_peak_mb": 36.6875,
+        "memory_total_gb": 26.83830272,
+        "flops_total_tflop": 11.442866618368,
+        "memory_reduction_factor": 2.0
+      },
+      "int8": {
+        "dtype": "int8",
+        "dtype_bytes": 1.0,
+        "execution_time": 0.0006480216979980469,
+        "memory_peak_mb": 36.6875,
+        "memory_total_gb": 13.41915136,
+        "flops_total_tflop": 11.442866618368,
+        "memory_reduction_factor": 4.0
+      },
+      "int4": {
+        "dtype": "int4",
+        "dtype_bytes": 0.5,
+        "execution_time": 0.00032711029052734375,
+        "memory_peak_mb": 36.6875,
+        "memory_total_gb": 6.70957568,
+        "flops_total_tflop": 11.442866618368,
+        "memory_reduction_factor": 8.0
+      }
+    },
+    "metrics": [
+      {
+        "operation": "prefill_calculation",
+        "execution_time": 0.0002009868621826172,
+        "memory_peak": 36.671875,
+        "memory_avg": 36.671875,
+        "cpu_usage": 0.4,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "decode_calculation",
+        "execution_time": 0.0004749298095703125,
+        "memory_peak": 36.671875,
+        "memory_avg": 36.671875,
+        "cpu_usage": 0.8,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "scaling_0.5x",
+        "execution_time": 0.0004150867462158203,
+        "memory_peak": 36.671875,
+        "memory_avg": 36.671875,
+        "cpu_usage": 0.6,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "scaling_1.0x",
+        "execution_time": 0.0003829002380371094,
+        "memory_peak": 36.671875,
+        "memory_avg": 36.671875,
+        "cpu_usage": 0.5,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "scaling_2.0x",
+        "execution_time": 0.00029277801513671875,
+        "memory_peak": 36.671875,
+        "memory_avg": 36.671875,
+        "cpu_usage": 0.4,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "scaling_4.0x",
+        "execution_time": 0.0005769729614257812,
+        "memory_peak": 36.6875,
+        "memory_avg": 36.6875,
+        "cpu_usage": 0.6,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "dtype_fp32",
+        "execution_time": 0.0002529621124267578,
+        "memory_peak": 36.6875,
+        "memory_avg": 36.6875,
+        "cpu_usage": 0.4,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "dtype_fp16",
+        "execution_time": 0.0003032684326171875,
+        "memory_peak": 36.6875,
+        "memory_avg": 36.6875,
+        "cpu_usage": 0.5,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "dtype_bf16",
+        "execution_time": 0.00026297569274902344,
+        "memory_peak": 36.6875,
+        "memory_avg": 36.6875,
+        "cpu_usage": 0.4,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "dtype_int8",
+        "execution_time": 0.0006480216979980469,
+        "memory_peak": 36.6875,
+        "memory_avg": 36.6875,
+        "cpu_usage": 0.9,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "dtype_int4",
+        "execution_time": 0.00032711029052734375,
+        "memory_peak": 36.6875,
+        "memory_avg": 36.6875,
+        "cpu_usage": 0.5,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      }
+    ]
+  },
+  "data_type_validation": {
+    "fp32": {
+      "dtype_bytes": 4.0,
+      "memory_reduction_factor": 1.0,
+      "memory_gb": 9.976676352,
+      "flops_tflop": 1.572226465792,
+      "reuse": 814.3714772355618,
+      "memory_components": {
+        "attention": 4.563402752,
+        "projections": 1.073741824,
+        "mlp": 0.989855744,
+        "embeddings": 0.033554432,
+        "layer_norm": 0.000262144,
+        "weights": 2.778988544
+      }
+    },
+    "fp16": {
+      "dtype_bytes": 2.0,
+      "memory_reduction_factor": 2.0,
+      "memory_gb": 4.988338176,
+      "flops_tflop": 1.572226465792,
+      "reuse": 1628.7429544711235,
+      "memory_components": {
+        "attention": 2.281701376,
+        "projections": 0.536870912,
+        "mlp": 0.494927872,
+        "embeddings": 0.016777216,
+        "layer_norm": 0.000131072,
+        "weights": 1.389494272
+      }
+    },
+    "bf16": {
+      "dtype_bytes": 2.0,
+      "memory_reduction_factor": 2.0,
+      "memory_gb": 4.988338176,
+      "flops_tflop": 1.572226465792,
+      "reuse": 1628.7429544711235,
+      "memory_components": {
+        "attention": 2.281701376,
+        "projections": 0.536870912,
+        "mlp": 0.494927872,
+        "embeddings": 0.016777216,
+        "layer_norm": 0.000131072,
+        "weights": 1.389494272
+      }
+    },
+    "int8": {
+      "dtype_bytes": 1.0,
+      "memory_reduction_factor": 4.0,
+      "memory_gb": 2.494169088,
+      "flops_tflop": 1.572226465792,
+      "reuse": 3257.485908942247,
+      "memory_components": {
+        "attention": 1.140850688,
+        "projections": 0.268435456,
+        "mlp": 0.247463936,
+        "embeddings": 0.008388608,
+        "layer_norm": 6.5536e-05,
+        "weights": 0.694747136
+      }
+    },
+    "int4": {
+      "dtype_bytes": 0.5,
+      "memory_reduction_factor": 8.0,
+      "memory_gb": 1.247084544,
+      "flops_tflop": 1.572226465792,
+      "reuse": 6514.971817884494,
+      "memory_components": {
+        "attention": 0.570425344,
+        "projections": 0.134217728,
+        "mlp": 0.123731968,
+        "embeddings": 0.004194304,
+        "layer_norm": 3.2768e-05,
+        "weights": 0.347373568
+      }
+    }
+  },
+  "end_time": 1759289317.863235,
+  "total_duration": 4.061600923538208
+}
