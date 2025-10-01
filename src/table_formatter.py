@@ -62,6 +62,10 @@ Attention Heads: {self.config.num_attention_heads} (KV: {self.config.num_key_val
     
     def _calculate_total_parameters(self) -> int:
         """Calculate total model parameters"""
+        # Check if we have validation result with official parameter count
+        if hasattr(self, '_validation_result') and self._validation_result and not self._validation_result['valid']:
+            return int(self._validation_result['official'])
+        
         # Import here to avoid circular imports
         try:
             from .transformer_calculator import calculate_model_parameters

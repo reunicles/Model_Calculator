@@ -130,6 +130,26 @@ def create_config_from_args(args):
         decode_len=args.decode_len
     )
     
+    # Validate parameters against Hugging Face metadata
+    validation_result = None
+    if config:
+        try:
+            from transformer_calculator import validate_parameters_with_hf_metadata
+            model_id = args.hf_model.replace('https://huggingface.co/', '').replace('@', '')
+            validation_result = validate_parameters_with_hf_metadata(config, model_id, tolerance_percent=20.0)
+            
+            if not validation_result['valid']:
+                print(f"\n⚠️  PARAMETER VALIDATION WARNING")
+                print(f"   {validation_result['error']}")
+                print(f"\n💡 RECOMMENDATION: Using official parameter count from Hugging Face metadata:")
+                print(f"   Official: {validation_result['official']:,.0f} parameters ({validation_result['official']/1e9:.1f}B)")
+                print(f"   Our calculation: {validation_result['calculated']:,.0f} parameters ({validation_result['calculated']/1e9:.1f}B)")
+                print(f"\n   This model has a complex architecture that our simplified")
+                print(f"   parameter calculation cannot fully capture.")
+                print(f"   The official count will be used for all calculations.\n")
+        except Exception as e:
+            print(f"Warning: Could not validate parameters against HF metadata: {e}")
+    
     # Set the hyperparameter sequence length for pretraining
     if config:
         config.hp_seq_len = hp_seq_len
@@ -180,7 +200,7 @@ def create_config_from_args(args):
         print("Failed to fetch model from Hugging Face.")
         sys.exit(1)
     
-    return config
+    return config, validation_result
 
 
 def get_model_max_sequence_length(model_path: str) -> Optional[int]:
@@ -275,11 +295,15 @@ def main():
     args = parse_args()
     
     try:
-        # Create configuration
-        config = create_config_from_args(args)
+        # Create configuration and get validation result
+        config, validation_result = create_config_from_args(args)
         
         # Create calculator
         calculator = TransformerCalculator(config)
+        
+        # Pass validation result to calculator if available
+        if validation_result and not validation_result['valid']:
+            calculator._validation_result = validation_result
         
         # Determine operation mode
         mode = OperationMode(args.mode)

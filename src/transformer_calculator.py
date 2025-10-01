@@ -2492,6 +2492,9 @@ class TransformerCalculator:
             
             # Add hardware comparison for comprehensive analysis
             formatter = TableFormatter(self.config)
+            # Pass validation result to formatter if available
+            if hasattr(self, '_validation_result') and self._validation_result:
+                formatter._validation_result = self._validation_result
             # Map data types for hardware comparison
             dtype_mapping = {
                 'fp32': 'fp32',
@@ -2513,6 +2516,9 @@ class TransformerCalculator:
         else:
             # Use TableFormatter for individual tables
             formatter = TableFormatter(self.config)
+            # Pass validation result to formatter if available
+            if hasattr(self, '_validation_result') and self._validation_result:
+                formatter._validation_result = self._validation_result
             if table_type == "memory":
                 components = self.calculate_memory(mode)
                 return formatter.format_memory_table(components, mode.value)
