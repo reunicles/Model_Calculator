@@ -47,7 +47,13 @@ try:
 except ImportError:
     # Fallback for when run as script
     from datatypes import DataType, DataTypeDetector
-    from context import MemoryContext, CalculationContext
+    try:
+        from .context import MemoryContext, CalculationContext
+    except ImportError:
+        try:
+            from .context import MemoryContext
+        except ImportError:
+            from context import MemoryContext, CalculationContext
     from table_formatter import TableFormatter
 
 
@@ -310,7 +316,10 @@ class ComponentCalculator:
             # MoE calculation
             moe_calc = MoECalculator(self.config)
             # Create MemoryContext from CalculationContext
-            from context import MemoryContext
+            try:
+                from .context import MemoryContext
+            except ImportError:
+                from context import MemoryContext
             memory_context = MemoryContext(
                 seq_len=context.seq_len,
                 batch_size=context.batch_size,
@@ -1297,7 +1306,10 @@ class PretrainingStrategy(CalculationStrategy):
     
     def _create_memory_context(self):
         """Create memory context for MoE calculations"""
-        from context import MemoryContext
+        try:
+            from .context import MemoryContext
+        except ImportError:
+            from context import MemoryContext
         return MemoryContext(seq_len=self.config.sequence_length,
             batch_size=self.config.batch_size,
             hidden_size=self.config.hidden_size,
@@ -1346,7 +1358,10 @@ class PrefillStrategy(CalculationStrategy):
     
     def _create_memory_context(self):
         """Create memory context for MoE calculations"""
-        from context import MemoryContext
+        try:
+            from .context import MemoryContext
+        except ImportError:
+            from context import MemoryContext
         return MemoryContext(seq_len=self.config.sequence_length,
             batch_size=self.config.batch_size,
             hidden_size=self.config.hidden_size,
@@ -1693,7 +1708,10 @@ class CalculationEngine:
     
     def _create_context(self, mode: OperationMode) -> 'CalculationContext':
         """Create calculation context from config and mode"""
-        from context import CalculationContext
+        try:
+            from .context import CalculationContext
+        except ImportError:
+            from context import CalculationContext
         
         if mode == OperationMode.PRETRAINING:
             # Use hp_seq_len for pretraining
