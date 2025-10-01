@@ -144,8 +144,21 @@ def fetch_model():
         if not config:
             return jsonify({'success': False, 'error': 'Failed to fetch model configuration'}), 400
         
-        # Calculate model parameters
+        # Calculate model parameters with validation
         total_params = calculate_model_parameters(config)
+        
+        # Validate parameters against Hugging Face metadata
+        try:
+            from transformer_calculator import validate_parameters_with_hf_metadata
+            model_id = hf_path.replace('https://huggingface.co/', '').replace('@', '')
+            validation_result = validate_parameters_with_hf_metadata(config, model_id, tolerance_percent=20.0)
+            
+            # Use official parameter count if validation fails
+            if not validation_result['valid'] and validation_result['official'] is not None:
+                total_params = int(validation_result['official'])
+        except Exception as e:
+            # If validation fails, use calculated parameters
+            pass
         
         # Format model information
         model_info = {
@@ -391,8 +404,21 @@ def calculate_hf_model():
         flops = calculator.calculate_flops(operation_mode)
         reuse = calculator.calculate_reuse(operation_mode)
         
-        # Calculate total parameters
+        # Calculate total parameters with validation
         total_params = calculate_model_parameters(config)
+        
+        # Validate parameters against Hugging Face metadata
+        try:
+            from transformer_calculator import validate_parameters_with_hf_metadata
+            model_id = hf_path.replace('https://huggingface.co/', '').replace('@', '')
+            validation_result = validate_parameters_with_hf_metadata(config, model_id, tolerance_percent=20.0)
+            
+            # Use official parameter count if validation fails
+            if not validation_result['valid'] and validation_result['official'] is not None:
+                total_params = int(validation_result['official'])
+        except Exception as e:
+            # If validation fails, use calculated parameters
+            pass
         
         # Format results
         results = {
