@@ -1,0 +1,112 @@
+[
+  {
+    "model_name": "Small Dense Model (7B)",
+    "config": {
+      "num_layers": 32,
+      "hidden_size": 4096,
+      "num_attention_heads": 32,
+      "intermediate_size": 11008,
+      "vocab_size": 32000,
+      "model_type": "dense",
+      "dtype": "bf16",
+      "num_experts": 1,
+      "top_k": 1
+    },
+    "results": {
+      "memory_total": 26838302720.0,
+      "flops_total": 11442866618368.0,
+      "reuse_total": 3113.3807728902743,
+      "execution_time": 6.198883056640625e-05,
+      "accuracy_score": 1.0
+    },
+    "notes": "Standard 7B parameter model"
+  },
+  {
+    "model_name": "Large Dense Model (70B)",
+    "config": {
+      "num_layers": 80,
+      "hidden_size": 8192,
+      "num_attention_heads": 64,
+      "intermediate_size": 28672,
+      "vocab_size": 32000,
+      "model_type": "dense",
+      "dtype": "bf16",
+      "num_experts": 1,
+      "top_k": 1
+    },
+    "results": {
+      "memory_total": 224740245504.0,
+      "flops_total": 126586644856832.0,
+      "reuse_total": 6494.283083560015,
+      "execution_time": 4.38690185546875e-05,
+      "accuracy_score": 1.0
+    },
+    "notes": "Large 70B parameter model"
+  },
+  {
+    "model_name": "MoE Model (8 experts)",
+    "config": {
+      "num_layers": 32,
+      "hidden_size": 4096,
+      "num_attention_heads": 32,
+      "intermediate_size": 11008,
+      "vocab_size": 32000,
+      "model_type": "moe",
+      "dtype": "bf16",
+      "num_experts": 8,
+      "top_k": 2
+    },
+    "results": {
+      "memory_total": 66701020176.0,
+      "flops_total": 5538763112704.0,
+      "reuse_total": 133.1509548446898,
+      "execution_time": 5.91278076171875e-05,
+      "accuracy_score": 1.0
+    },
+    "notes": "MoE model with 8 experts"
+  },
+  {
+    "model_name": "Quantized Model (INT8)",
+    "config": {
+      "num_layers": 32,
+      "hidden_size": 4096,
+      "num_attention_heads": 32,
+      "intermediate_size": 11008,
+      "vocab_size": 32000,
+      "model_type": "dense",
+      "dtype": "int8",
+      "num_experts": 1,
+      "top_k": 1
+    },
+    "results": {
+      "memory_total": 13419151360.0,
+      "flops_total": 11442866618368.0,
+      "reuse_total": 6226.761545780549,
+      "execution_time": 3.790855407714844e-05,
+      "accuracy_score": 1.0
+    },
+    "notes": "INT8 quantized model"
+  },
+  {
+    "model_name": "Extreme Quantization (INT4)",
+    "config": {
+      "num_layers": 32,
+      "hidden_size": 4096,
+      "num_attention_heads": 32,
+      "intermediate_size": 11008,
+      "vocab_size": 32000,
+      "model_type": "dense",
+      "dtype": "int4",
+      "num_experts": 1,
+      "top_k": 1
+    },
+    "results": {
+      "memory_total": 6709575680.0,
+      "flops_total": 11442866618368.0,
+      "reuse_total": 12453.523091561097,
+      "execution_time": 3.6716461181640625e-05,
+      "accuracy_score": 1.0
+    },
+    "notes": "INT4 quantized model"
+  }
+]

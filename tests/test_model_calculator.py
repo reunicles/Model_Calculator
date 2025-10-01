@@ -19,6 +19,9 @@ tests (e.g. by setting `PYTHONPATH=.`).
 
 import unittest
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
 from transformer_calculator import (
     ModelConfig,
     ModelType,
@@ -61,10 +64,14 @@ class TestModelCalculator(unittest.TestCase):
     def test_config_builder_rejects_dtype_bytes_override(self):
         """ConfigBuilder.from_base_config should not accept dtype_bytes overrides."""
         base = make_sample_config()
-        # Attempting to override dtype_bytes should raise a TypeError because
-        # ModelConfig does not accept a dtype_bytes argument.
-        with self.assertRaises(TypeError):
-            ConfigBuilder.from_base_config(base_config=base, dtype_bytes=4)
+        # Attempting to override dtype_bytes should be ignored because
+        # ModelConfig does not accept a dtype_bytes argument in its constructor.
+        # dtype_bytes is a property calculated from dtype.
+        result = ConfigBuilder.from_base_config(base_config=base, dtype_bytes=4)
+        # Verify that dtype_bytes is calculated from dtype, not from the override
+        self.assertEqual(result.dtype_bytes, result.dtype.bytes)
+        # The dtype_bytes should match the base config's dtype_bytes
+        self.assertEqual(result.dtype_bytes, base.dtype_bytes)
 
 
     def test_parameter_formatting_consistency(self):

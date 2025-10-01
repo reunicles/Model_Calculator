@@ -1,0 +1,257 @@
+[
+  {
+    "model_name": "Qwen2.5-7B",
+    "hf_path": "Qwen/Qwen2.5-7B",
+    "success": true,
+    "error": null,
+    "config": {
+      "num_layers": 28,
+      "hidden_size": 3584,
+      "num_attention_heads": 28,
+      "intermediate_size": 18944,
+      "vocab_size": 152064,
+      "model_type": "dense",
+      "dtype": "bf16",
+      "num_experts": 1,
+      "top_k": 1
+    },
+    "results": {
+      "prefill": {
+        "memory_gb": 21.701607424,
+        "flops_tflop": 10.339345235968,
+        "reuse": 3149.8580399549332,
+        "memory_components": {
+          "attention": 6.987710464,
+          "projections": 1.644167168,
+          "mlp": 2.583691264,
+          "embeddings": 0.029360128,
+          "layer_norm": 0.000401408,
+          "weights": 10.33883648,
+          "kv_cache": 0.117440512
+        }
+      },
+      "decode": {
+        "memory_gb": 12.10754048,
+        "flops_tflop": 0.005593104384,
+        "reuse": 2288.2882993573753,
+        "memory_components": {
+          "attention": 0.001806336,
+          "projections": 1.644167168,
+          "mlp": 0.001261568,
+          "embeddings": 1.4336e-05,
+          "layer_norm": 0.000401408,
+          "weights": 10.33883648,
+          "kv_cache": 0.121053184
+        }
+      }
+    },
+    "data_type_detected": "bf16",
+    "execution_time": 0.47334814071655273
+  },
+  {
+    "model_name": "Phi-3.5-mini",
+    "hf_path": "microsoft/Phi-3.5-mini-instruct",
+    "success": true,
+    "error": null,
+    "config": {
+      "num_layers": 32,
+      "hidden_size": 3072,
+      "num_attention_heads": 32,
+      "intermediate_size": 8192,
+      "vocab_size": 32064,
+      "model_type": "dense",
+      "dtype": "bf16",
+      "num_experts": 1,
+      "top_k": 1
+    },
+    "results": {
+      "prefill": {
+        "memory_gb": 19.550306304,
+        "flops_tflop": 6.617202425856,
+        "reuse": 2333.7512629186567,
+        "memory_components": {
+          "attention": 8.992587776,
+          "projections": 2.415919104,
+          "mlp": 1.476395008,
+          "embeddings": 0.025165824,
+          "layer_norm": 0.000393216,
+          "weights": 5.834539008,
+          "kv_cache": 0.805306368
+        }
+      },
+      "decode": {
+        "memory_gb": 9.083957248,
+        "flops_tflop": 0.003332308992,
+        "reuse": 1447.3530617520275,
+        "memory_components": {
+          "attention": 0.00229376,
+          "projections": 2.415919104,
+          "mlp": 0.000720896,
+          "embeddings": 1.2288e-05,
+          "layer_norm": 0.000393216,
+          "weights": 5.834539008,
+          "kv_cache": 0.830078976
+        }
+      }
+    },
+    "data_type_detected": "bf16",
+    "execution_time": 0.25166988372802734
+  },
+  {
+    "model_name": "Qwen2.5-14B",
+    "hf_path": "Qwen/Qwen2.5-14B",
+    "success": true,
+    "error": null,
+    "config": {
+      "num_layers": 48,
+      "hidden_size": 5120,
+      "num_attention_heads": 40,
+      "intermediate_size": 13824,
+      "vocab_size": 152064,
+      "model_type": "dense",
+      "dtype": "bf16",
+      "num_experts": 1,
+      "top_k": 1
+    },
+    "results": {
+      "prefill": {
+        "memory_gb": 48.510140416,
+        "flops_tflop": 22.21773160448,
+        "reuse": 3865.0689275162313,
+        "memory_components": {
+          "attention": 17.11276032,
+          "projections": 6.03979776,
+          "mlp": 3.724541952,
+          "embeddings": 0.04194304,
+          "layer_norm": 0.00098304,
+          "weights": 21.18746112,
+          "kv_cache": 0.402653184
+        }
+      },
+      "decode": {
+        "memory_gb": 27.649544192,
+        "flops_tflop": 0.01163132928,
+        "reuse": 2427.0588167602314,
+        "memory_components": {
+          "attention": 0.00442368,
+          "projections": 6.03979776,
+          "mlp": 0.001818624,
+          "embeddings": 2.048e-05,
+          "layer_norm": 0.00098304,
+          "weights": 21.18746112,
+          "kv_cache": 0.415039488
+        }
+      }
+    },
+    "data_type_detected": "bf16",
+    "execution_time": 0.27205920219421387
+  },
+  {
+    "model_name": "Qwen2.5-72B",
+    "hf_path": "Qwen/Qwen2.5-72B",
+    "success": true,
+    "error": null,
+    "config": {
+      "num_layers": 80,
+      "hidden_size": 8192,
+      "num_attention_heads": 64,
+      "intermediate_size": 29568,
+      "vocab_size": 152064,
+      "model_type": "dense",
+      "dtype": "bf16",
+      "num_experts": 1,
+      "top_k": 1
+    },
+    "results": {
+      "prefill": {
+        "memory_gb": 187.07120128,
+        "flops_tflop": 109.750373056512,
+        "reuse": 6539.971297331975,
+        "memory_components": {
+          "attention": 45.63402752,
+          "projections": 24.15919104,
+          "mlp": 12.3731968,
+          "embeddings": 0.067108864,
+          "layer_norm": 0.00262144,
+          "weights": 104.163966976,
+          "kv_cache": 0.67108864
+        }
+      },
+      "decode": {
+        "memory_gb": 129.035382784,
+        "flops_tflop": 0.054848913408,
+        "reuse": 4475.339568210743,
+        "memory_components": {
+          "attention": 0.01179648,
+          "projections": 24.15919104,
+          "mlp": 0.0060416,
+          "embeddings": 3.2768e-05,
+          "layer_norm": 0.00262144,
+          "weights": 104.163966976,
+          "kv_cache": 0.69173248
+        }
+      }
+    },
+    "data_type_detected": "bf16",
+    "execution_time": 0.3091881275177002
+  },
+  {
+    "model_name": "Qwen2.5-MoE-A14B",
+    "hf_path": "Qwen/Qwen2.5-MoE-A14B",
+    "success": false,
+    "error": "Failed to fetch model configuration",
+    "config": null,
+    "results": {},
+    "data_type_detected": null,
+    "execution_time": 0.0
+  },
+  {
+    "model_name": "Qwen2.5-7B",
+    "hf_path": "Qwen/Qwen2.5-7B",
+    "success": true,
+    "error": null,
+    "config": {
+      "num_layers": 28,
+      "hidden_size": 3584,
+      "num_attention_heads": 28,
+      "intermediate_size": 18944,
+      "vocab_size": 152064,
+      "model_type": "dense",
+      "dtype": "bf16",
+      "num_experts": 1,
+      "top_k": 1
+    },
+    "results": {
+      "prefill": {
+        "memory_gb": 21.701607424,
+        "flops_tflop": 10.339345235968,
+        "reuse": 3149.8580399549332,
+        "memory_components": {
+          "attention": 6.987710464,
+          "projections": 1.644167168,
+          "mlp": 2.583691264,
+          "embeddings": 0.029360128,
+          "layer_norm": 0.000401408,
+          "weights": 10.33883648,
+          "kv_cache": 0.117440512
+        }
+      },
+      "decode": {
+        "memory_gb": 12.10754048,
+        "flops_tflop": 0.005593104384,
+        "reuse": 2288.2882993573753,
+        "memory_components": {
+          "attention": 0.001806336,
+          "projections": 1.644167168,
+          "mlp": 0.001261568,
+          "embeddings": 1.4336e-05,
+          "layer_norm": 0.000401408,
+          "weights": 10.33883648,
+          "kv_cache": 0.121053184
+        }
+      }
+    },
+    "data_type_detected": "bf16",
+    "execution_time": 0.278609037399292
+  }
+]

@@ -16,6 +16,9 @@ import unittest
 import math
 from typing import Dict, Any
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
 from transformer_calculator import (
     TransformerCalculator, ModelConfig, ModelType, OperationMode, DataType,
     MemoryComponents, FLOPSComponents, ReuseComponents,

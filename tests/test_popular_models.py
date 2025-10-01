@@ -9,6 +9,9 @@ import sys
 import os
 sys.path.append('.')
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
 from transformer_calculator import TransformerCalculator, ModelConfig, ModelType, DataType, OperationMode
 from hf_model_fetcher import create_model_config_from_hf
 
