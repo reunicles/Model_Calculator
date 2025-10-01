@@ -73,9 +73,10 @@ KV Cache     = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × bytes
 
 ### 1. Attention Memory
 ```math
-Standard: S² × B × H × bytes
-
-Flash:    block_size × B × H × bytes × factor
+Standard: S² × B × H × bytes        
+```
+```math        
+Flash:    block_size × B × H × bytes × factor        
 ```
 
 **Variables:**
@@ -93,7 +94,8 @@ Flash:    block_size × B × H × bytes × factor
 ### 2. MLP Memory
 ```math
 Dense: 2BSd × d_ff × bytes
-
+```
+```math
 MoE:   K × util × 2BSd × d_ff_moe × bytes
 ```
 
@@ -112,11 +114,11 @@ MoE:   K × util × 2BSd × d_ff_moe × bytes
 - **MoE**: Expert utilization with capacity factor
 
 ### 3. KV Cache
-```math
+
 KV_bytes = B × S × H × (d_k + d_v) × bytes
 
 Read/Write = 2 × KV_bytes per token
-```
+
 
 **Variables:**
 - **B**: Batch size
