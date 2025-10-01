@@ -146,7 +146,7 @@ class ComponentCalculator:
     def calculate_attention_components(self, context: CalculationContext) -> Tuple[float, float]:
         """Calculate attention memory and FLOPS with realistic Flash Attention modeling"""
         # Memory calculation
-        if self.config.use_flash_attention and context.seq_len > self.config.flash_attention_block_size:
+        if self.config.use_flash_attention and context.seq_len >= self.config.flash_attention_block_size:
             # Flash Attention: Realistic memory traffic modeling
             attention_memory = self._calculate_flash_attention_memory(context)
         else:
@@ -219,9 +219,12 @@ class ComponentCalculator:
             memory_factor = 2.5  # 150% overhead for tiling
         
         # Flash Attention memory: Block-wise processing
-        # Each block processes: block_size × batch_size × num_heads
-        # But we need to account for recomputation and tiling overhead
-        flash_attention_memory = block_size * batch_size * num_heads * dtype_bytes * memory_factor
+        # Flash Attention reduces memory from O(seq_len^2) to O(seq_len) by processing in blocks
+        # But we still need to process all sequence positions, just not all at once
+        # Memory scales with seq_len but with much smaller constant factors
+        # For very long sequences, we need more memory for intermediate computations
+        # Flash Attention still needs significant memory for intermediate computations
+        flash_attention_memory = seq_len * batch_size * num_heads * dtype_bytes * 2.0 * memory_factor
         
         # Output projection memory (always needed)
         output_memory = seq_len * batch_size * hidden_size * dtype_bytes
