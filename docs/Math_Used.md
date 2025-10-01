@@ -75,11 +75,19 @@ Standard: S² × B × H × bytes
 Flash:    block_size × B × H × bytes × factor
 ```
 
+**Explanation:**
+- **Standard**: Quadratic scaling with sequence length
+- **Flash**: Linear scaling with block size optimization
+
 ### 2. MLP Memory
 ```math
-Dense: 2BSdd<sub>ff</sub> × bytes
+Dense: 2BSd × d<sub>ff</sub> × bytes
 MoE:   K × util × 2BSd × d<sub>ff</sub><sub>moe</sub> × bytes
 ```
+
+**Explanation:**
+- **Dense**: Standard MLP with up and down projections
+- **MoE**: Expert utilization with capacity factor
 
 ### 3. KV Cache
 ```math
@@ -87,11 +95,20 @@ KV_bytes = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × bytes<sub>kv</sub>
 Read/Write = 2 × KV_bytes per token
 ```
 
+**Explanation:**
+- **Storage**: Full sequence length for all past tokens
+- **Access**: Read existing + write new token per step
+
 ### 4. Expert Weights (MoE)
 ```math
 Expert_weights = E × 2 × d × d<sub>ff</sub><sub>moe</sub> × bytes
 # Shared across all layers (no L multiplication)
 ```
+
+**Explanation:**
+- **E**: Number of experts
+- **Shared**: Same expert weights used across all layers
+- **Storage**: Only stored once in HBM, not per layer
 
 ---
 
@@ -132,6 +149,10 @@ util = K / E
 HBM_Storage = E × 2 × d × d<sub>ff</sub><sub>moe</sub> × bytes
 GPU_Memory = K × util × 2 × d × d<sub>ff</sub><sub>moe</sub> × bytes
 ```
+
+**Explanation:**
+- **HBM**: All expert weights stored in high-bandwidth memory
+- **GPU**: Only active experts loaded into GPU memory
 
 ### Capacity Factor
 ```math
