@@ -391,6 +391,9 @@ def calculate_hf_model():
         flops = calculator.calculate_flops(operation_mode)
         reuse = calculator.calculate_reuse(operation_mode)
         
+        # Calculate total parameters
+        total_params = calculate_model_parameters(config)
+        
         # Format results
         results = {
             'memory': {
@@ -428,6 +431,21 @@ def calculate_hf_model():
                 'sequence_length': config.sequence_length,
                 'batch_size': config.batch_size,
                 'hf_path': hf_path
+            },
+            'model_info': {
+                'total_parameters': total_params,
+                'total_parameters_formatted': _format_parameters_human(total_params),
+                'num_layers': config.num_layers,
+                'hidden_size': config.hidden_size,
+                'num_attention_heads': config.num_attention_heads,
+                'num_key_value_heads': config.num_key_value_heads,
+                'intermediate_size': config.intermediate_size,
+                'vocab_size': config.vocab_size,
+                'dtype': config.dtype.value,
+                'dtype_bytes': config.dtype_bytes,
+                'sequence_length': config.sequence_length,
+                'batch_size': config.batch_size,
+                'mode': mode
             }
         }
         
