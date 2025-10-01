@@ -72,8 +72,16 @@ KV Cache     = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × bytes
 ### 1. Attention Memory
 ```math
 Standard: S² × B × H × bytes
-Flash:    block-size × B × H × bytes × factor
+Flash:    block_size × B × H × bytes × factor
 ```
+
+**Variables:**
+- **S**: Sequence length
+- **B**: Batch size
+- **H**: Number of attention heads
+- **block_size**: Flash attention block size (typically 64-128)
+- **factor**: Memory efficiency factor (1.1-2.5)
+- **bytes**: Data type bytes
 
 **Explanation:**
 - **Standard**: Quadratic scaling with sequence length
@@ -85,15 +93,33 @@ Dense: 2BSd × d_ff × bytes
 MoE:   K × util × 2BSd × d_ff_moe × bytes
 ```
 
+**Variables:**
+- **B**: Batch size
+- **S**: Sequence length
+- **d**: Hidden dimension
+- **d_ff**: MLP intermediate dimension (typically 4×d)
+- **K**: Number of active experts per token
+- **util**: Expert utilization factor (K/E)
+- **d_ff_moe**: MoE expert intermediate dimension
+- **bytes**: Data type bytes
+
 **Explanation:**
 - **Dense**: Standard MLP with up and down projections
 - **MoE**: Expert utilization with capacity factor
 
 ### 3. KV Cache
 ```math
-KV_bytes = B × S × H × (d_k + d_v) × bytes_kv
+KV_bytes = B × S × H × (d_k + d_v) × bytes
 Read/Write = 2 × KV_bytes per token
 ```
+
+**Variables:**
+- **B**: Batch size
+- **S**: Sequence length  
+- **H**: Number of attention heads
+- **d_k**: Key dimension (d/H)
+- **d_v**: Value dimension (d/H)
+- **bytes**: Data type bytes (2 for FP16/BF16, 4 for FP32)
 
 **Explanation:**
 - **Storage**: Full sequence length for all past tokens
@@ -104,6 +130,12 @@ Read/Write = 2 × KV_bytes per token
 Expert_weights = E × 2 × d × d_ff_moe × bytes
 # Shared across all layers (no L multiplication)
 ```
+
+**Variables:**
+- **E**: Number of experts
+- **d**: Hidden dimension
+- **d_ff_moe**: MoE expert intermediate dimension
+- **bytes**: Data type bytes
 
 **Explanation:**
 - **E**: Number of experts
@@ -149,6 +181,14 @@ util = K / E
 HBM_Storage = E × 2 × d × d_ff_moe × bytes
 GPU_Memory = K × util × 2 × d × d_ff_moe × bytes
 ```
+
+**Variables:**
+- **E**: Number of experts
+- **K**: Number of active experts per token
+- **util**: Expert utilization factor (K/E)
+- **d**: Hidden dimension
+- **d_ff_moe**: MoE expert intermediate dimension
+- **bytes**: Data type bytes
 
 **Explanation:**
 - **HBM**: All expert weights stored in high-bandwidth memory
