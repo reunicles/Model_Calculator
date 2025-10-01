@@ -413,6 +413,54 @@ python3 cli_calculator.py --hf-model "Qwen/Qwen2.5-72B" --batch-size 1 --mode pr
 
 ---
 
+## 🚀 Future Improvements
+
+### 1. Speculative Decoding Support
+**Planned Feature**: Advanced decoding optimization for faster inference
+
+Speculative decoding uses a smaller, faster "draft" model to generate multiple candidate tokens, which are then verified by the larger target model in a single batched forward pass. This technique can significantly reduce memory bandwidth requirements and improve throughput.
+
+**Key Benefits**:
+- **Reduced Memory Bandwidth**: Multiple tokens verified in one pass reduces HBM weight access
+- **Improved Throughput**: Parallel verification of speculative tokens
+- **Efficient Resource Usage**: Draft model overhead is minimal compared to main model
+
+**Mathematical Impact**:
+```
+Decode FLOPS: 1× (Draft Model FLOPS) + 1× (Target Model FLOPS) per step
+Decode Memory: 1× (Draft Model Weights) + 1× (Target Model Weights) per step
+```
+
+*Note*: The draft model is typically much smaller than the target model, so its computational overhead is negligible in overall calculations.
+
+### 2. Advanced Attention Optimizations
+**Planned Features**: MQA/GQA/MLA and related memory-efficient techniques
+
+Modern attention mechanisms use various optimization strategies to reduce memory bandwidth pressure during decode operations:
+
+**Multi-Query Attention (MQA)**:
+- **Shared Key-Value Heads**: Reduces KV cache memory requirements
+- **Memory Savings**: Significant reduction in HBM bandwidth usage
+- **Trade-off**: Slight accuracy impact for substantial memory gains
+
+**Multi-Latent Attention (MLA)**:
+- **Compressed Representations**: Uses latent embeddings instead of full attention
+- **Additional Compute**: Requires FLOPS to convert latent embeddings to standard KV cache
+- **Memory Efficiency**: Dramatically reduces memory bandwidth requirements
+
+**Implementation Plan**:
+- Add support for configurable attention head ratios
+- Implement MLA latent embedding calculations
+- Add memory bandwidth analysis for different attention patterns
+
+### 3. Additional Planned Features
+- **Dynamic Batching**: Automatic batch size optimization based on memory constraints
+- **Model Parallelism**: Multi-GPU memory and compute distribution analysis
+- **Quantization Support**: INT8/INT4 quantization impact on memory and compute
+- **Real-time Profiling**: Live memory and FLOPS monitoring during inference
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
