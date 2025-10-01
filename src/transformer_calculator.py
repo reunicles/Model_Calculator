@@ -1598,28 +1598,38 @@ class DecodeStrategy(CalculationStrategy):
     
     def _calculate_decode_attention_reuse(self, memory_components: MemoryComponents, flops_components: FLOPSComponents) -> float:
         """Calculate arithmetic intensity for attention stage in decode mode"""
-        # For decode mode, use KV cache memory instead of full attention memory
-        # and matrix-vector FLOPS instead of matrix-matrix FLOPS
+        # For decode mode, we need to account for the full context length
+        # The attention computation involves Q (1 token) @ K^T (full context)
         
-        # Decode attention memory: KV cache + small attention computation
+        # Decode attention memory: KV cache + attention computation
         kv_cache_memory = memory_components.kv_cache
         
-        # Small attention computation memory (matrix-vector operations)
-        # For decode mode, we process 1 token at a time, so seq_len = 1
-        seq_len = 1  # Decode processes 1 token at a time
+        # Attention computation memory for decode mode
+        # Q: 1 token, K: full context, V: full context
         batch_size = self.config.batch_size
         num_heads = self.config.num_attention_heads
+        head_dim = self.config.hidden_size // num_heads
         dtype_bytes = self.config.dtype_bytes
+        context_length = self.config.sequence_length + max(self.config.decode_len - 1, 0)
         
-        # Matrix-vector attention computation memory (only for 1 token)
-        small_attention_memory = batch_size * num_heads * seq_len * dtype_bytes
+        # Q projection memory (1 token)
+        q_memory = batch_size * self.config.hidden_size * dtype_bytes
+        
+        # K, V cache access memory (full context)
+        kv_access_memory = batch_size * num_heads * context_length * head_dim * dtype_bytes
+        
+        # Attention scores memory (1 token × full context)
+        attention_scores_memory = batch_size * num_heads * context_length * dtype_bytes
+        
+        # Output projection memory (1 token)
+        output_memory = batch_size * self.config.hidden_size * dtype_bytes
         
         # Total decode attention memory
-        decode_attention_memory = kv_cache_memory + small_attention_memory
+        decode_attention_memory = q_memory + kv_access_memory + attention_scores_memory + output_memory
         
-        # Decode attention FLOPS: matrix-vector operations (O(seq_len))
-        head_dim = self.config.hidden_size // num_heads
-        decode_attention_flops = batch_size * num_heads * seq_len * head_dim
+        # Decode attention FLOPS: Q @ K^T for 1 token against full context
+        # Math_Used.md: 2BdS for decode attention
+        decode_attention_flops = 2 * batch_size * self.config.hidden_size * context_length
         
         if decode_attention_memory == 0:
             return 0.0
@@ -1627,10 +1637,13 @@ class DecodeStrategy(CalculationStrategy):
         return decode_attention_flops / decode_attention_memory
     
     def _calculate_pre_attention_reuse(self, memory: MemoryComponents, flops: FLOPSComponents) -> float:
-        """Calculate pre-attention reuse"""
+        """Calculate pre-attention reuse for decode mode"""
+        # For decode mode, pre-attention includes embeddings and projections
+        # Both should have reasonable FLOPS/byte ratios
         memory_bytes = memory.embeddings + memory.projections
+        flops_total = flops.embeddings + flops.projections
         if memory_bytes > 0:
-            return flops.embeddings / memory_bytes
+            return flops_total / memory_bytes
         return 0.0
     
     def _calculate_attention_reuse(self, memory: MemoryComponents, flops: FLOPSComponents) -> float:
