@@ -725,14 +725,14 @@
             // Basic parameters
             const basicParams = [
                 { label: 'Total Parameters', value: modelInfo.total_parameters_formatted },
-                { label: 'Model Type', value: modelInfo.model_type.toUpperCase() },
+                { label: 'Model Type', value: (modelInfo.model_type || 'Unknown').toUpperCase() },
                 { label: 'Layers', value: modelInfo.num_layers },
                 { label: 'Hidden Size', value: modelInfo.hidden_size },
                 { label: 'Attention Heads', value: modelInfo.num_attention_heads },
                 { label: 'KV Heads', value: modelInfo.num_key_value_heads },
                 { label: 'Intermediate Size', value: modelInfo.intermediate_size },
                 { label: 'Vocab Size', value: modelInfo.vocab_size.toLocaleString() },
-                { label: 'Data Type', value: modelInfo.dtype.toUpperCase() },
+                { label: 'Data Type', value: (modelInfo.dtype || 'Unknown').toUpperCase() },
                 { label: 'Sequence Length', value: modelInfo.sequence_length },
                 { label: 'Batch Size', value: modelInfo.batch_size }
             ];
@@ -894,7 +894,7 @@
                         </div>
                         <div class="parameter-item">
                             <div class="parameter-label">Model Type</div>
-                            <div class="parameter-value">${results.model_info.model_type.toUpperCase()}</div>
+                            <div class="parameter-value">${(results.model_info.model_type || 'Unknown').toUpperCase()}</div>
                         </div>
                         <div class="parameter-item">
                             <div class="parameter-label">Layers</div>
@@ -906,11 +906,11 @@
                         </div>
                         <div class="parameter-item">
                             <div class="parameter-label">Data Type</div>
-                            <div class="parameter-value">${results.model_info.dtype.toUpperCase()}</div>
+                            <div class="parameter-value">${(results.model_info.dtype || 'Unknown').toUpperCase()}</div>
                         </div>
                         <div class="parameter-item">
                             <div class="parameter-label">Operation Mode</div>
-                            <div class="parameter-value">${results.model_info.mode.toUpperCase()}</div>
+                            <div class="parameter-value">${(results.model_info.mode || 'Unknown').toUpperCase()}</div>
                         </div>
                     </div>
                 </div>

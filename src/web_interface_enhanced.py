@@ -462,6 +462,7 @@ def calculate_hf_model():
                 'hf_path': hf_path
             },
             'model_info': {
+                'model_type': config.model_type.value,
                 'total_parameters': total_params,
                 'total_parameters_formatted': _format_parameters_human(total_params),
                 'num_layers': config.num_layers,
