@@ -1,23 +1,23 @@
 {
-  "start_time": 1759289313.801634,
+  "start_time": 1759289866.908874,
   "benchmark_suite": {
     "total_tests": 5,
     "average_accuracy": 1.0,
-    "average_execution_time": 5.469322204589844e-05,
+    "average_execution_time": 5.3882598876953125e-05,
     "passed_tests": 5
   },
   "real_world_validation": {
     "total_tests": 6,
     "successful_tests": 5,
     "success_rate": 83.33333333333334,
-    "average_execution_time": 0.33594722747802735
+    "average_execution_time": 0.3173400402069092
   },
   "performance_profiling": {
     "calculator_performance": {
       "prefill": {
-        "execution_time": 0.0002009868621826172,
-        "memory_peak_mb": 36.671875,
-        "memory_avg_mb": 36.671875,
+        "execution_time": 0.0002739429473876953,
+        "memory_peak_mb": 33.171875,
+        "memory_avg_mb": 33.171875,
         "cpu_usage": 0.4,
         "memory_total_gb": 26.83830272,
         "flops_total_tflop": 11.442866618368,
@@ -33,10 +33,10 @@
         }
       },
       "decode": {
-        "execution_time": 0.0004749298095703125,
-        "memory_peak_mb": 36.671875,
-        "memory_avg_mb": 36.671875,
-        "cpu_usage": 0.8,
+        "execution_time": 0.00011110305786132812,
+        "memory_peak_mb": 33.171875,
+        "memory_avg_mb": 33.171875,
+        "cpu_usage": 0.2,
         "memory_total_gb": 15.734603776,
         "flops_total_tflop": 0.005717884928,
         "reuse_total": 1935.678872810914,
@@ -54,8 +54,8 @@
     "scaling_performance": {
       "0.5x": {
         "scale_factor": 0.5,
-        "execution_time": 0.0004150867462158203,
-        "memory_peak_mb": 36.671875,
+        "execution_time": 0.0001499652862548828,
+        "memory_peak_mb": 33.171875,
         "memory_total_gb": 13.567000576,
         "flops_total_tflop": 5.738613178368,
         "config": {
@@ -66,8 +66,8 @@
       },
       "1.0x": {
         "scale_factor": 1.0,
-        "execution_time": 0.0003829002380371094,
-        "memory_peak_mb": 36.671875,
+        "execution_time": 0.00041484832763671875,
+        "memory_peak_mb": 33.171875,
         "memory_total_gb": 26.83830272,
         "flops_total_tflop": 11.442866618368,
         "config": {
@@ -78,8 +78,8 @@
       },
       "2.0x": {
         "scale_factor": 2.0,
-        "execution_time": 0.00029277801513671875,
-        "memory_peak_mb": 36.671875,
+        "execution_time": 0.0005209445953369141,
+        "memory_peak_mb": 33.171875,
         "memory_total_gb": 53.380907008,
         "flops_total_tflop": 22.851373498368,
         "config": {
@@ -90,8 +90,8 @@
       },
       "4.0x": {
         "scale_factor": 4.0,
-        "execution_time": 0.0005769729614257812,
-        "memory_peak_mb": 36.6875,
+        "execution_time": 0.0003380775451660156,
+        "memory_peak_mb": 33.171875,
         "memory_total_gb": 1115.206713344,
         "flops_total_tflop": 677.866098393088,
         "config": {
@@ -105,8 +105,8 @@
       "fp32": {
         "dtype": "fp32",
         "dtype_bytes": 4.0,
-        "execution_time": 0.0002529621124267578,
-        "memory_peak_mb": 36.6875,
+        "execution_time": 0.0003840923309326172,
+        "memory_peak_mb": 33.171875,
         "memory_total_gb": 53.67660544,
         "flops_total_tflop": 11.442866618368,
         "memory_reduction_factor": 1.0
@@ -114,8 +114,8 @@
       "fp16": {
         "dtype": "fp16",
         "dtype_bytes": 2.0,
-        "execution_time": 0.0003032684326171875,
-        "memory_peak_mb": 36.6875,
+        "execution_time": 0.0005390644073486328,
+        "memory_peak_mb": 33.171875,
         "memory_total_gb": 26.83830272,
         "flops_total_tflop": 11.442866618368,
         "memory_reduction_factor": 2.0
@@ -123,8 +123,8 @@
       "bf16": {
         "dtype": "bf16",
         "dtype_bytes": 2.0,
-        "execution_time": 0.00026297569274902344,
-        "memory_peak_mb": 36.6875,
+        "execution_time": 0.0002868175506591797,
+        "memory_peak_mb": 33.171875,
         "memory_total_gb": 26.83830272,
         "flops_total_tflop": 11.442866618368,
         "memory_reduction_factor": 2.0
@@ -132,8 +132,8 @@
       "int8": {
         "dtype": "int8",
         "dtype_bytes": 1.0,
-        "execution_time": 0.0006480216979980469,
-        "memory_peak_mb": 36.6875,
+        "execution_time": 0.0003428459167480469,
+        "memory_peak_mb": 33.171875,
         "memory_total_gb": 13.41915136,
         "flops_total_tflop": 11.442866618368,
         "memory_reduction_factor": 4.0
@@ -141,8 +141,8 @@
       "int4": {
         "dtype": "int4",
         "dtype_bytes": 0.5,
-        "execution_time": 0.00032711029052734375,
-        "memory_peak_mb": 36.6875,
+        "execution_time": 0.0003979206085205078,
+        "memory_peak_mb": 33.171875,
         "memory_total_gb": 6.70957568,
         "flops_total_tflop": 11.442866618368,
         "memory_reduction_factor": 8.0
@@ -151,9 +151,9 @@
     "metrics": [
       {
         "operation": "prefill_calculation",
-        "execution_time": 0.0002009868621826172,
-        "memory_peak": 36.671875,
-        "memory_avg": 36.671875,
+        "execution_time": 0.0002739429473876953,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
         "cpu_usage": 0.4,
         "memory_components": {},
         "flops_components": {},
@@ -161,100 +161,100 @@
       },
       {
         "operation": "decode_calculation",
-        "execution_time": 0.0004749298095703125,
-        "memory_peak": 36.671875,
-        "memory_avg": 36.671875,
-        "cpu_usage": 0.8,
+        "execution_time": 0.00011110305786132812,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
+        "cpu_usage": 0.2,
         "memory_components": {},
         "flops_components": {},
         "reuse_components": {}
       },
       {
         "operation": "scaling_0.5x",
-        "execution_time": 0.0004150867462158203,
-        "memory_peak": 36.671875,
-        "memory_avg": 36.671875,
-        "cpu_usage": 0.6,
+        "execution_time": 0.0001499652862548828,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
+        "cpu_usage": 0.2,
         "memory_components": {},
         "flops_components": {},
         "reuse_components": {}
       },
       {
         "operation": "scaling_1.0x",
-        "execution_time": 0.0003829002380371094,
-        "memory_peak": 36.671875,
-        "memory_avg": 36.671875,
-        "cpu_usage": 0.5,
-        "memory_components": {},
-        "flops_components": {},
-        "reuse_components": {}
-      },
-      {
-        "operation": "scaling_2.0x",
-        "execution_time": 0.00029277801513671875,
-        "memory_peak": 36.671875,
-        "memory_avg": 36.671875,
-        "cpu_usage": 0.4,
-        "memory_components": {},
-        "flops_components": {},
-        "reuse_components": {}
-      },
-      {
-        "operation": "scaling_4.0x",
-        "execution_time": 0.0005769729614257812,
-        "memory_peak": 36.6875,
-        "memory_avg": 36.6875,
+        "execution_time": 0.00041484832763671875,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
         "cpu_usage": 0.6,
         "memory_components": {},
         "flops_components": {},
         "reuse_components": {}
       },
       {
+        "operation": "scaling_2.0x",
+        "execution_time": 0.0005209445953369141,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
+        "cpu_usage": 0.7,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
+        "operation": "scaling_4.0x",
+        "execution_time": 0.0003380775451660156,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
+        "cpu_usage": 0.5,
+        "memory_components": {},
+        "flops_components": {},
+        "reuse_components": {}
+      },
+      {
         "operation": "dtype_fp32",
-        "execution_time": 0.0002529621124267578,
-        "memory_peak": 36.6875,
-        "memory_avg": 36.6875,
-        "cpu_usage": 0.4,
+        "execution_time": 0.0003840923309326172,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
+        "cpu_usage": 0.7,
         "memory_components": {},
         "flops_components": {},
         "reuse_components": {}
       },
       {
         "operation": "dtype_fp16",
-        "execution_time": 0.0003032684326171875,
-        "memory_peak": 36.6875,
-        "memory_avg": 36.6875,
-        "cpu_usage": 0.5,
+        "execution_time": 0.0005390644073486328,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
+        "cpu_usage": 0.8,
         "memory_components": {},
         "flops_components": {},
         "reuse_components": {}
       },
       {
         "operation": "dtype_bf16",
-        "execution_time": 0.00026297569274902344,
-        "memory_peak": 36.6875,
-        "memory_avg": 36.6875,
-        "cpu_usage": 0.4,
+        "execution_time": 0.0002868175506591797,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
+        "cpu_usage": 0.5,
         "memory_components": {},
         "flops_components": {},
         "reuse_components": {}
       },
       {
         "operation": "dtype_int8",
-        "execution_time": 0.0006480216979980469,
-        "memory_peak": 36.6875,
-        "memory_avg": 36.6875,
-        "cpu_usage": 0.9,
+        "execution_time": 0.0003428459167480469,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
+        "cpu_usage": 0.5,
         "memory_components": {},
         "flops_components": {},
         "reuse_components": {}
       },
       {
         "operation": "dtype_int4",
-        "execution_time": 0.00032711029052734375,
-        "memory_peak": 36.6875,
-        "memory_avg": 36.6875,
-        "cpu_usage": 0.5,
+        "execution_time": 0.0003979206085205078,
+        "memory_peak": 33.171875,
+        "memory_avg": 33.171875,
+        "cpu_usage": 0.6,
         "memory_components": {},
         "flops_components": {},
         "reuse_components": {}
@@ -338,6 +338,6 @@
       }
     }
   },
-  "end_time": 1759289317.863235,
-  "total_duration": 4.061600923538208
+  "end_time": 1759289870.886539,
+  "total_duration": 3.9776649475097656
 }
