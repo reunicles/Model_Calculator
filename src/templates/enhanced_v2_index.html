@@ -795,30 +795,54 @@
             resultsDiv.innerHTML = '<div class="loading">Calculating...</div>';
             
             try {
-                const data = {
-                    model_type: document.getElementById('model_type').value,
-                    num_layers: parseInt(document.getElementById('num_layers').value),
-                    hidden_size: parseInt(document.getElementById('hidden_size').value),
-                    num_attention_heads: parseInt(document.getElementById('num_attention_heads').value),
-                    intermediate_size: parseInt(document.getElementById('intermediate_size').value),
-                    vocab_size: parseInt(document.getElementById('vocab_size').value),
-                    dtype: document.getElementById('dtype').value,
-                    sequence_length: parseInt(document.getElementById('sequence_length').value),
-                    batch_size: parseInt(document.getElementById('batch_size').value),
-                    mode: document.getElementById('mode').value,
-                    decode_len: parseInt(document.getElementById('decode_len').value),
-                    num_experts: parseInt(document.getElementById('num_experts').value),
-                    top_k: parseInt(document.getElementById('top_k').value),
-                    expert_capacity_factor: parseFloat(document.getElementById('expert_capacity_factor').value)
-                };
+                // Check if we're using a HuggingFace model
+                const hfPath = document.getElementById('hf_path').value;
+                let response;
                 
-                const response = await fetch('/api/calculate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
+                if (hfPath && hfPath.trim() !== '') {
+                    // Use HuggingFace model endpoint with parameter validation
+                    const data = {
+                        hf_path: hfPath,
+                        sequence_length: parseInt(document.getElementById('sequence_length').value),
+                        batch_size: parseInt(document.getElementById('batch_size').value),
+                        decode_len: parseInt(document.getElementById('decode_len').value),
+                        mode: document.getElementById('mode').value
+                    };
+                    
+                    response = await fetch('/api/calculate-hf', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    // Use manual configuration endpoint
+                    const data = {
+                        model_type: document.getElementById('model_type').value,
+                        num_layers: parseInt(document.getElementById('num_layers').value),
+                        hidden_size: parseInt(document.getElementById('hidden_size').value),
+                        num_attention_heads: parseInt(document.getElementById('num_attention_heads').value),
+                        intermediate_size: parseInt(document.getElementById('intermediate_size').value),
+                        vocab_size: parseInt(document.getElementById('vocab_size').value),
+                        dtype: document.getElementById('dtype').value,
+                        sequence_length: parseInt(document.getElementById('sequence_length').value),
+                        batch_size: parseInt(document.getElementById('batch_size').value),
+                        mode: document.getElementById('mode').value,
+                        decode_len: parseInt(document.getElementById('decode_len').value),
+                        num_experts: parseInt(document.getElementById('num_experts').value),
+                        top_k: parseInt(document.getElementById('top_k').value),
+                        expert_capacity_factor: parseFloat(document.getElementById('expert_capacity_factor').value)
+                    };
+                    
+                    response = await fetch('/api/calculate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                }
                 
                 const result = await response.json();
                 

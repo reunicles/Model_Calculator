@@ -246,8 +246,11 @@ def calculate():
         flops = calculator.calculate_flops(operation_mode)
         reuse = calculator.calculate_reuse(operation_mode)
         
-        # Calculate total parameters
+        # Calculate total parameters with validation
         total_params = calculate_model_parameters(config)
+        
+        # Note: For manual configuration, we don't have HF metadata to validate against
+        # So we use the calculated parameters directly
         
         # Format results
         results = {
