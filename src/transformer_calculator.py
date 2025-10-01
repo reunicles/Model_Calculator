@@ -217,14 +217,17 @@ class ComponentCalculator:
         
         # Flash Attention memory: Block-wise processing
         # Flash Attention reduces memory from O(seq_len^2) to O(seq_len) by processing in blocks
-        # But we still need to process all sequence positions, just not all at once
-        # Memory scales with seq_len but with much smaller constant factors
-        # For very long sequences, we need more memory for intermediate computations
-        # Flash Attention still needs significant memory for intermediate computations
-        flash_attention_memory = seq_len * batch_size * num_heads * dtype_bytes * 2.0 * memory_factor
+        # The key insight is that Flash Attention processes in blocks of size block_size
+        # Memory is dominated by the block processing, not the full sequence
+        # Each block processes: block_size × batch_size × num_heads
+        # Flash Attention memory is much smaller than standard attention
+        # It's roughly: block_size * batch_size * num_heads * dtype_bytes * small_factor
+        flash_attention_memory = block_size * batch_size * num_heads * dtype_bytes * 0.1 * memory_factor
         
         # Output projection memory (always needed)
-        output_memory = seq_len * batch_size * hidden_size * dtype_bytes
+        # For Flash Attention, the output is also processed in blocks
+        # The output memory is much smaller than the full sequence
+        output_memory = block_size * batch_size * hidden_size * dtype_bytes
         
         # Total Flash Attention memory (Q, K, V are handled by projections component)
         total_memory = flash_attention_memory + output_memory
