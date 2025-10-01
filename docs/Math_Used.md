@@ -34,11 +34,11 @@ KV Cache     = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × bytes
 | Operation | FLOPs | Memory | Arithmetic Intensity |
 |-----------|-------|--------|---------------------|
 | **QKV Projections** | `3BSd²` | `3BSd × bytes` | `d/bytes` |
-| **Attention Scores** | `2BSHd<sub>h</sub>S` | `2BSHd<sub>h</sub>S × bytes` | `1/bytes` |
-| **Attention × V** | `2BSHd<sub>h</sub>S` | `2BSHd<sub>h</sub>S × bytes` | `1/bytes` |
+| **Attention Scores** | `2BSHd_hS` | `2BSHd_hS × bytes` | `1/bytes` |
+| **Attention × V** | `2BSHd_hS` | `2BSHd_hS × bytes` | `1/bytes` |
 | **Output Projection** | `BSd²` | `BSd × bytes` | `d/bytes` |
-| **MLP Up** | `BSdd<sub>ff</sub>` | `BSdd<sub>ff</sub> × bytes` | `d<sub>ff</sub>/bytes` |
-| **MLP Down** | `BSdd<sub>ff</sub>` | `BSdd<sub>ff</sub> × bytes` | `d<sub>ff</sub>/bytes` |
+| **MLP Up** | `BSdd_ff` | `BSdd_ff × bytes` | `d_ff/bytes` |
+| **MLP Down** | `BSdd_ff` | `BSdd_ff × bytes` | `d_ff/bytes` |
 
 **Total per layer**: Sum all operations  
 **Total for model**: Multiply by L layers
@@ -72,7 +72,7 @@ KV Cache     = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × bytes
 ### 1. Attention Memory
 ```math
 Standard: S² × B × H × bytes
-Flash:    block_size × B × H × bytes × factor
+Flash:    block-size × B × H × bytes × factor
 ```
 
 **Explanation:**
@@ -81,8 +81,8 @@ Flash:    block_size × B × H × bytes × factor
 
 ### 2. MLP Memory
 ```math
-Dense: 2BSd × d<sub>ff</sub> × bytes
-MoE:   K × util × 2BSd × d<sub>ff</sub><sub>moe</sub> × bytes
+Dense: 2BSd × d_ff × bytes
+MoE:   K × util × 2BSd × d_ff_moe × bytes
 ```
 
 **Explanation:**
@@ -91,7 +91,7 @@ MoE:   K × util × 2BSd × d<sub>ff</sub><sub>moe</sub> × bytes
 
 ### 3. KV Cache
 ```math
-KV_bytes = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × bytes<sub>kv</sub>
+KV_bytes = B × S × H × (d_k + d_v) × bytes_kv
 Read/Write = 2 × KV_bytes per token
 ```
 
@@ -101,7 +101,7 @@ Read/Write = 2 × KV_bytes per token
 
 ### 4. Expert Weights (MoE)
 ```math
-Expert_weights = E × 2 × d × d<sub>ff</sub><sub>moe</sub> × bytes
+Expert_weights = E × 2 × d × d_ff_moe × bytes
 # Shared across all layers (no L multiplication)
 ```
 
@@ -146,8 +146,8 @@ util = K / E
 
 ### MoE Memory Optimization
 ```math
-HBM_Storage = E × 2 × d × d<sub>ff</sub><sub>moe</sub> × bytes
-GPU_Memory = K × util × 2 × d × d<sub>ff</sub><sub>moe</sub> × bytes
+HBM_Storage = E × 2 × d × d_ff_moe × bytes
+GPU_Memory = K × util × 2 × d × d_ff_moe × bytes
 ```
 
 **Explanation:**
@@ -190,8 +190,8 @@ capacity = S × B × K × capacity_factor
 
 ### KV Cache Optimization
 ```math
-KV_FP16 = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × 2
-KV_INT8 = B × S × H × (d<sub>k</sub> + d<sub>v</sub>) × 1
+KV_FP16 = B × S × H × (d_k + d_v) × 2
+KV_INT8 = B × S × H × (d_k + d_v) × 1
 # 2× memory reduction with INT8
 ```
 
